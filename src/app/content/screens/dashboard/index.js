@@ -7,7 +7,7 @@ import Init from "./layouts/init";
 
 export default function ScreenDashboard() {
   return (
-    <Container maxWidth="xl" className={styles.dashboardContainer}>
+    <Container className={styles.dashboardContainer} maxWidth="100%">
       <Topbar/>
       <Box display="flex" className={styles.dashboardContent}>
         <Sidebar/>

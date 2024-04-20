@@ -1,7 +1,7 @@
 import React from "react";
 
 //COMPONENTS
-import { Box, List, ListItem, ListItemText } from "@mui/material";
+import { Box, Collapse, List, ListItem, ListItemButton, ListItemText, ListItemIcon } from "@mui/material";
 
 //STYLES
 import styles from './Sidebar.module.css'
@@ -15,41 +15,69 @@ import { BsBoxSeam } from "react-icons/bs";
 import { PiUsersFour } from "react-icons/pi";
 import { RiPagesLine } from "react-icons/ri";
 import { GrMenu } from "react-icons/gr";
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 
 const Sidebar = () => {
+
+  const [open, setOpen] = React.useState(true);
+
+  const handleClick = () => {
+    setOpen(!open);
+  };
+
+  const openSidebar = ()=>{
+    
+  }
+
 
   return (
     <Box bgcolor="primary.main" color="primary.contrastText" width={300} className={styles.sidebar} >
       <GrMenu className={styles.menu__hamburguer}/>
       <List>
         <ListItem button>
-          <AiOutlineUser width="25" height="25"/>
-          <ListItemText primary="Meus Dados"/>
+          <AiOutlineUser className={styles.icon}/>
+          <ListItemText primary="Meus Dados" className={styles.icon__text}/>
         </ListItem>
         <ListItem button>
-          <BiSolidCoffeeBean width="25" height="25"/>
-          <ListItemText primary="Meus Planos" />
+          <BiSolidCoffeeBean className={styles.icon}/>
+          <ListItemText primary="Meus Planos" className={styles.icon__text}/>
         </ListItem>
         <ListItem button>
-          <FaUsers width="25" height="25"/>
-          <ListItemText primary="Usuários" />
+          <FaUsers className={styles.icon} />
+          <ListItemText primary="Usuários" className={styles.icon__text}/>
         </ListItem>
         <ListItem button>
-          <BsPersonVcardFill width="25" height="25"/>
-          <ListItemText primary="Cargos" />
+          <BsPersonVcardFill className={styles.icon}/>
+          <ListItemText primary="Cargos" className={styles.icon__text}/>
         </ListItem>
         <ListItem button>
-          <BsBoxSeam width="25" height="25"/>
-          <ListItemText primary="Produtos" />
+          <BsBoxSeam className={styles.icon}/>
+          <ListItemText primary="Produtos" className={styles.icon__text}/>
         </ListItem>
         <ListItem button>
-          <PiUsersFour width="25" height="25"/>
-          <ListItemText primary="Clientes" />
+          <PiUsersFour className={styles.icon}/>
+          <ListItemText primary="Clientes" className={styles.icon__text}/>
         </ListItem>
-        <ListItem button>
-          <RiPagesLine width="25" height="25"/>
-          <ListItemText primary="Páginas" />
-        </ListItem>
+
+        <ListItemButton onClick={handleClick}>
+          <RiPagesLine className={styles.icon}/>
+          <ListItemText primary="Páginas" className={styles.icon__text}/>
+          {open ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+        <Collapse in={open} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            <ListItemButton sx={{ pl: 4 }}>
+              <ListItemText primary="Sobre Nós" className={styles.icon__text}/>
+            </ListItemButton>
+            <ListItemButton sx={{ pl: 4 }}>
+              <ListItemText primary="Produtos" className={styles.icon__text}/>
+            </ListItemButton>
+            <ListItemButton sx={{ pl: 4 }}>
+              <ListItemText primary="Contato" className={styles.icon__text}/>
+            </ListItemButton>
+          </List>
+        </Collapse>
       </List>
     </Box>
   );

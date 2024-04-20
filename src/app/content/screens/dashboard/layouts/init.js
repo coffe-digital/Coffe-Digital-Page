@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, List, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TablePagination, TableRow } from "@mui/material";
+import { Box, List, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, Typography } from "@mui/material";
 import styles from './Init.module.css'
 import { useTheme } from '@mui/material/styles';
 import IconButton from '@mui/material/IconButton';
@@ -94,19 +94,13 @@ export default function Init(){
       const [page, setPage] = React.useState(0);
       const [rowsPerPage, setRowsPerPage] = React.useState(5);
       const rows = [
-        createData('Cupcake', 305, 3.7),
-        createData('Donut', 452, 25.0),
-        createData('Eclair', 262, 16.0),
-        createData('Frozen yoghurt', 159, 6.0),
-        createData('Gingerbread', 356, 16.0),
-        createData('Honeycomb', 408, 3.2),
-        createData('Ice cream sandwich', 237, 9.0),
-        createData('Jelly Bean', 375, 0.0),
-        createData('KitKat', 518, 26.0),
-        createData('Lollipop', 392, 0.2),
-        createData('Marshmallow', 318, 0),
-        createData('Nougat', 360, 19.0),
-        createData('Oreo', 437, 18.0),
+        createData('Café 150g - Avelã', 305, 3.7),
+        createData('Café 150g - Baunilha', 452, 25.0),
+        createData('Café 150g - Caramelo', 262, 16.0),
+        createData('Café 150g - Tradicional', 159, 6.0),
+        createData('Capuccino - Caseiro', 356, 16.0),
+        createData('Capuccino - Expresso', 408, 3.2),
+        createData('Café 200g - Tradicional', 237, 9.0),
       ].sort((a, b) => (a.calories < b.calories ? -1 : 1));
       
       const emptyRows =
@@ -140,23 +134,44 @@ export default function Init(){
                     
                 </Box>
             </Box>
-            <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
+
+            <TableContainer component={Paper}  className={styles.init__table}>
+              <Typography typography="h6">Novos Produtos</Typography>
+              <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Nome</TableCell>
+                    <TableCell align="right">Categoria</TableCell>
+                    <TableCell align="right">Marca</TableCell>
+                    <TableCell align="right">Descrição</TableCell>
+                    <TableCell align="right">Quantidade</TableCell>
+                    <TableCell align="right">Valor</TableCell>
+                </TableRow>
+                </TableHead>
                 <TableBody>
                 {(rowsPerPage > 0
                     ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     : rows
                 ).map((row) => (
                     <TableRow key={row.name}>
-                    <TableCell component="th" scope="row">
-                        {row.name}
-                    </TableCell>
-                    <TableCell style={{ width: 160 }} align="right">
-                        {row.calories}
-                    </TableCell>
-                    <TableCell style={{ width: 160 }} align="right">
-                        {row.fat}
-                    </TableCell>
+                      <TableCell component="th" scope="row">
+                          {row.name}
+                      </TableCell>
+                      <TableCell style={{ width: 160 }} align="right">
+                          {row.calories}
+                      </TableCell>
+                      <TableCell style={{ width: 160 }} align="right">
+                          {row.fat}
+                      </TableCell>
+                      <TableCell style={{ width: 160 }} align="right">
+                          {row.fat}
+                      </TableCell>
+                      <TableCell style={{ width: 160 }} align="right">
+                          {row.fat}
+                      </TableCell>
+                      <TableCell style={{ width: 160 }} align="right">
+                          {row.fat}
+                      </TableCell>
                     </TableRow>
                 ))}
                 {emptyRows > 0 && (
@@ -168,15 +183,15 @@ export default function Init(){
                 <TableFooter>
                     <TableRow>
                         <TablePagination
-                        rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-                        colSpan={3}
+                        rowsPerPageOptions={[5, 10, 25, { label: 'Todos', value: -1 }]}
+                        colSpan={6}
                         count={rows.length}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         slotProps={{
                             select: {
                             inputProps: {
-                                'aria-label': 'rows per page',
+                                'aria-label': 'Linhas por página',
                             },
                             native: true,
                             },
