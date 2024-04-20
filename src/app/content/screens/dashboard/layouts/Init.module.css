@@ -1,0 +1,35 @@
+.init{
+    width: 100%;
+    margin: 0 auto;
+    height: auto;
+    overflow-y: scroll;
+}
+
+.init__top{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem;
+    height: auto;
+    width: 100%;
+}
+
+.init__top__brown_1, .init__top__brown_2, .init__top__brown_3{
+    height: 200px;
+    width: 100%;
+    margin: 0 auto;
+    border-radius: 5px;
+}
+
+.init__top__brown_1{
+    background-color: #815839;
+}
+
+.init__top__brown_2{
+    background-color: #a57551;
+}
+
+.init__top__brown_3{
+    background-color: #c99872;
+}
