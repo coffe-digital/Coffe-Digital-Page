@@ -1,12 +1,26 @@
 .sidebar{
-    height: 100vh;
+    height: auto;
     background-color: #455459;
     padding: 2rem 1rem;
     margin: 0;
+    overflow-y: scroll;
 }
 
 .menu__hamburguer{
     width: 35px;
     height: 50px;
     margin-left: 1rem;
+}
+
+.menu__list{
+    height: auto;
+}
+
+.icon{
+    width: 30px;
+    height: 50px;
+}
+
+.icon__text{
+    padding: 0 .7rem;
 }

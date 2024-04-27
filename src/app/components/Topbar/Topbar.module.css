@@ -4,3 +4,13 @@
     height: 60px;
     background-color: #1E3932;
 }
+
+.topbar__boxLogo{
+    padding: 1.4rem;
+}
+
+.topbar__icon{
+    width: 100px;
+    height: 40px;
+    object-fit: cover;
+}
