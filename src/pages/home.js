@@ -1,5 +1,5 @@
 
-import Home from "@/app/content/screens/home/Home";
+import Home from "@/app/content/screens/site/home/Home";
 
 export default function App() {
   return (
