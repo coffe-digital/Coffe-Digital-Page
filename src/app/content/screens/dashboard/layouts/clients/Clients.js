@@ -16,7 +16,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import styles from "./users.module.css";
+import styles from "./Clients.module.css";
 import { useTheme } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
@@ -105,22 +105,23 @@ export function CustomPaginationActionsTable() {
     setPage(0);
   };
 }
-export default function Users() {
-  function createData(id, name, email, password, position) {
-    return { id, name, email, password, position };
+export default function Clients() {
+  function createData(id, name, rg, cpf, phone, birthdate, adress, email, password ) {
+    return { id, name, rg, cpf, phone, birthdate, adress, email, password };
   }
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const rows = [
-    createData(1,"João Silva", "joao.silva@example.com", "123456", "Funcionário"),
-    createData(2, "Maria Santos", "maria.santos@example.com", "abc123", "Admin"),
-    createData(3, "Pedro Oliveira", "pedro.oliveira@example.com", "senha123", "Desenvolvedor"),
-    createData(4, "Ana Costa", "ana.costa@example.com", "987654", "Estoque"),
-    createData(5, "Laura Ferreira", "laura.ferreira@example.com", "ferreira123", "Estoque"),
-    createData(6, "Carlos Martins", "carlos.martins@example.com", "martins456", "Estoque"),
-    createData(7, "Camila Almeida", "camila.almeida@example.com", "almeida789", "Funcionário"),
-    createData(8, "Rafael Sousa", "rafael.sousa@example.com", "sousa321", "Funcionário"),
-    createData(9, "Fernanda Lima", "fernanda.lima@example.com", "lima987", "Admin")
+    createData(1, "Antônio Silva", "9876543", "456.789.123-10", "+55 11 91234-5678", "1984-02-12", "Rua das Flores, 123", "antonio.silva@example.com", "silva123"),
+    createData(2, "Juliana Oliveira", "5432167", "654.321.987-10", "+55 11 92345-6789", "1979-09-08", "Avenida Central, 456", "juliana.oliveira@example.com", "juliana456"),
+    createData(3, "Lucas Pereira", "3217654", "321.654.987-10", "+55 11 93456-7890", "1993-12-20", "Rua dos Pássaros, 789", "lucas.pereira@example.com", "lucas789"),
+    createData(4, "Patrícia Santos", "6543217", "789.123.456-10", "+55 11 94567-8901", "1986-06-30", "Avenida das Árvores, 321", "patricia.santos@example.com", "patricia123"),
+    createData(5, "Gabriel Souza", "4321765", "147.258.369-10", "+55 11 95678-9012", "1990-11-18", "Rua dos Coqueiros, 987", "gabriel.souza@example.com", "souza123"),
+    createData(6, "Ana Paula Lima", "3217654", "258.369.147-10", "+55 11 96789-0123", "1982-04-12", "Avenida dos Girassóis, 654", "anapaula.lima@example.com", "anapaula456"),
+    createData(7, "Paulo Martins", "7654321", "369.147.258-10", "+55 11 97890-1234", "1997-07-05", "Rua das Pedras, 147", "paulo.martins@example.com", "paulo789"),
+    createData(8, "Isabela Costa", "5432167", "147.258.369-10", "+55 11 98901-2345", "1980-10-28", "Avenida dos Pinheiros, 258", "isabela.costa@example.com", "isabela123"),
+    createData(9, "Marcos Lima", "3217654", "369.147.258-10", "+55 11 98901-2345", "1996-01-05", "Rua das Rosas, 369", "marcos.lima@example.com", "marcos123"),
+    createData(10, "Renata Oliveira", "7654321", "369.147.258-10", "+55 11 98901-2345", "1983-04-28", "Avenida dos Lírios, 147", "renata.oliveira@example.com", "renata123")
 
   ].sort((a, b) => (a.id < b.id ? -1 : 1));
 
@@ -137,26 +138,46 @@ export default function Users() {
   };
 
   return (
-    <Box className={styles.users}>
+    <Box className={styles.clients}>
       <Typography typography="h4" style={{ padding: "1rem", fontWeight: "bold", color: "#1E3932"}}>
-        Usuários
+        Clientes
       </Typography>
-      <TableContainer component={Paper} className={styles.users__table}>
-        <Box className={styles.users__table__top}>
-            <Box className={styles.users__table__search}>
-                <TextField maxRows="1" id="outlined-basic" label="Pesquise os planos" variant="outlined" className={styles.users__table__input} />
-                <Button style={{background: '#D9D9D9', color: '#000'}} variant="contained" className={styles.users__table__button}>Pesquisar</Button>
-            </Box>
-            <Box className={styles.users__table__actions}>
-                <Button variant="contained" style={{background: '#4E392A'}} className={styles.users__search__input} >
-                    <ArticleIcon/>
-                    Gerar Relatório
-                </Button>
-                <Button variant="contained" style={{background: '#1E3932'}} className={styles.users__search__input}>
-                    <AddIcon/>
-                    Novo Usuário
-                </Button>
-            </Box>
+      <TableContainer component={Paper} className={styles.clients__table}>
+        <Box className={styles.clients__table__top}>
+          <Box className={styles.clients__table__search}>
+            <TextField
+              maxRows="1"
+              id="outlined-basic"
+              label="Pesquise clientes"
+              variant="outlined"
+              className={styles.clients__table__input}
+            />
+            <Button
+              style={{ background: "#D9D9D9", color: "#000" }}
+              variant="contained"
+              className={styles.clients__table__button}
+            >
+              Pesquisar
+            </Button>
+          </Box>
+          <Box className={styles.clients__table__actions}>
+            <Button
+              variant="contained"
+              style={{ background: "#4E392A" }}
+              className={styles.clients__search__input}
+            >
+              <ArticleIcon />
+              Gerar Relatório
+            </Button>
+            <Button
+              variant="contained"
+              style={{ background: "#1E3932" }}
+              className={styles.clients__search__input}
+            >
+              <AddIcon />
+              Novo Produto
+            </Button>
+          </Box>
         </Box>
         <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
           <TableHead>
@@ -164,13 +185,25 @@ export default function Users() {
               <TableCell sx={{ fontWeight: "bold" }}>ID</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Nome</TableCell>
               <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                E-mail
+                RG
+              </TableCell>
+              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                CPF
+              </TableCell>
+              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                Telefone
+              </TableCell>
+              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                Data de nascimento
+              </TableCell>
+              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                Endereço
+              </TableCell>
+              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                Email
               </TableCell>
               <TableCell align="right" sx={{ fontWeight: "bold" }}>
                 Senha
-              </TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                Cargo
               </TableCell>
             </TableRow>
           </TableHead>
@@ -187,14 +220,27 @@ export default function Users() {
                   {row.name}
                 </TableCell>
                 <TableCell style={{ width: 160 }} align="right">
+                  {row.rg}
+                </TableCell>
+                <TableCell style={{ width: 160 }} align="right">
+                  {row.cpf}
+                </TableCell>
+                <TableCell style={{ width: 160 }} align="right">
+                  {row.phone}
+                </TableCell>
+                <TableCell style={{ width: 160 }} align="right">
+                  {row.birthdate}
+                </TableCell>
+                <TableCell style={{ width: 160 }} align="right">
+                  {row.adress}
+                </TableCell>
+                <TableCell style={{ width: 160 }} align="right">
                   {row.email}
                 </TableCell>
                 <TableCell style={{ width: 160 }} align="right">
                   {row.password}
                 </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
-                  {row.position}
-                </TableCell>
+                
               </TableRow>
             ))}
             {emptyRows > 0 && (

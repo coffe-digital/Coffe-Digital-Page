@@ -9,6 +9,7 @@ import Plans from "./layouts/plans/Plans";
 import Users from "./layouts/users/Users";
 import Positions from "./layouts/positions/Positions";
 
+import Clients from "./layouts/clients/Clients";
 
 export default function ScreenDashboard() {
 
@@ -23,7 +24,8 @@ export default function ScreenDashboard() {
     Produtos: <Products />,
     Planos: <Plans/>,
     Usuários: <Users/>,
-    Cargos: <Positions />
+    Cargos: <Positions />,
+    Clientes: <Clients />
 
   };
 
