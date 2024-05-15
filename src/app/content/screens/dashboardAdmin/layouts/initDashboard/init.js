@@ -89,7 +89,7 @@ export function CustomPaginationActionsTable() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
-  // Avoid a layout jump when reaching the last page with empty rows.
+
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
@@ -199,12 +199,6 @@ export default function Init() {
     <Box className={styles.init}>
       <Box className={styles.init__top}>
         <Box className={styles.init__top__brown_1}>
-          <Box className={styles.init__top__brown_1__image}>
-            <Image src={CoffeInital.src} width={100} height={100}/>
-          </Box>
-          <Box>
-            <Typography sx={{fontSize: '1.5rem'}}> 0 Produtos Adicionados</Typography>
-          </Box>
         </Box>
         <Box className={styles.init__top__brown_2}></Box>
         <Box className={styles.init__top__brown_3}></Box>

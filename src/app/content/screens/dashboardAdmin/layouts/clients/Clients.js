@@ -1,4 +1,5 @@
 import React from "react";
+import { useState } from "react";
 import {
   Box,
   Button,
@@ -26,6 +27,7 @@ import LastPageIcon from "@mui/icons-material/LastPage";
 import ArticleIcon from '@mui/icons-material/Article';
 import AddIcon from '@mui/icons-material/Add';
 import { FaEdit, FaTrash } from "react-icons/fa";
+import ReportModal from "@/app/components/Modal/Admin/ReportModal";
 
 function TablePaginationActions(props) {
   const theme = useTheme();
@@ -93,7 +95,6 @@ export function CustomPaginationActionsTable() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
-  // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
@@ -112,6 +113,7 @@ export default function Clients() {
   }
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false); 
   const rows = [
     createData(1, "Antônio Silva", "654.321.987-10", "+55 11 92345-6789", "1979-09-08", "Avenida Central, 456", "juliana.oliveira@example.com"),
     createData(3, "Lucas Pereira", "321.654.987-10", "+55 11 93456-7890", "1993-12-20", "Rua dos Pássaros, 789", "lucas.pereira@example.com"),
@@ -137,10 +139,22 @@ export default function Clients() {
     setPage(0);
   };
 
+  const handleOpenReportModal = () => {
+    setIsReportModalOpen(true);
+  };
+
+  const handleCloseReportModal = () => {
+    setIsReportModalOpen(false);
+  };
+ 
+
   return (
     <Box className={styles.clients}>
-      <Typography typography="h4" style={{ padding: "1rem", fontWeight: "bold", color: "#1E3932"}}>
+      <Typography typography="h4" style={{fontWeight: "bold", color: "#1E3932"}}>
         Clientes
+      </Typography>
+      <Typography typography="label" style={{padding: '0 0 1rem 0', color: "#1E3932", fontSize: '.875rem'}}>
+        Gerencie todos as informações dos seus clientes
       </Typography>
       <TableContainer component={Paper} className={styles.clients__table}>
         <Box className={styles.clients__table__top}>
@@ -165,6 +179,7 @@ export default function Clients() {
               variant="contained"
               style={{ background: "#4E392A" }}
               className={styles.clients__search__input}
+              onClick={handleOpenReportModal}
             >
               <ArticleIcon />
               Gerar Relatório
@@ -261,6 +276,9 @@ export default function Clients() {
           </TableFooter>
         </Table>
       </TableContainer>
+      
+      {/* Modal para gerar relatório */}
+      <ReportModal open={isReportModalOpen} onClose={handleCloseReportModal} />
     </Box>
   );
 }

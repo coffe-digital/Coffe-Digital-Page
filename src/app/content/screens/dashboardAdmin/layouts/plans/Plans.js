@@ -151,11 +151,16 @@ export default function Plans() {
   };
 
 
+
   return (
     <Box className={styles.plans}>
       
-      <Typography typography="h4" style={{ padding: "1rem", fontWeight: "bold", color: "#1E3932"}}>
+      <Typography typography="h4" style={{ fontWeight: "bold", color: "#1E3932"}}>
         Planos
+      </Typography>
+
+      <Typography typography="label" style={{padding: '0 0 1rem 0', color: "#1E3932", fontSize: '.875rem'}}>
+        Gerencie todos os seus planos
       </Typography>
       <TableContainer component={Paper} className={styles.plans__table}>
         <Box className={styles.plans__table__top}>

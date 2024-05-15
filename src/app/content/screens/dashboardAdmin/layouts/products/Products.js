@@ -1,4 +1,5 @@
 import React from "react";
+import { useState } from "react";
 import {
   Box,
   Button,
@@ -26,6 +27,7 @@ import LastPageIcon from "@mui/icons-material/LastPage";
 import ArticleIcon from "@mui/icons-material/Article";
 import AddIcon from "@mui/icons-material/Add";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import ProductModal from "@/app/components/Modal/Admin/CreateProductsModal";
 
 function TablePaginationActions(props) {
   const theme = useTheme();
@@ -112,7 +114,7 @@ export default function Products() {
   }
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false); 
   // Função para criar um objeto de dados de café
   const createCoffeeData = (
     id,
@@ -204,13 +206,27 @@ export default function Products() {
     setPage(0);
   };
 
+  const handleOpenCreateProductModal = () => {
+    console.log(isProductModalOpen)
+    setIsProductModalOpen(true);
+  };
+
+  const handleCloseProductModal = () => {
+    setIsProductModalOpen(false);
+  };
+ 
+
   return (
     <Box className={styles.product}>
       <Typography
         typography="h4"
-        style={{ padding: "1rem", fontWeight: "bold", color: "#1E3932"}}
+        style={{fontWeight: "bold", color: "#1E3932"}}
       >
         Produtos
+      </Typography>
+
+      <Typography typography="label" style={{padding: '0 0 1rem 0', color: "#1E3932", fontSize: '.875rem'}}>
+        Gerencie todos os seus produtos
       </Typography>
       <TableContainer component={Paper} className={styles.product__table}>
         <Box className={styles.product__table__top}>
@@ -243,6 +259,7 @@ export default function Products() {
               variant="contained"
               style={{ background: "#1E3932" }}
               className={styles.product__search__input}
+              onClick={handleOpenCreateProductModal}
             >
               <AddIcon />
               Novo Produto
@@ -337,6 +354,8 @@ export default function Products() {
           </TableFooter>
         </Table>
       </TableContainer>
+        {/* Modal para criar produto */}
+        <ProductModal open={isProductModalOpen} onClose={handleCloseProductModal} />
     </Box>
   );
 }

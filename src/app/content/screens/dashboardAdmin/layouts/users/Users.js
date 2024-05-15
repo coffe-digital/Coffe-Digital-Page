@@ -150,8 +150,11 @@ export default function Users() {
 
   return (
     <Box className={styles.users}>
-      <Typography typography="h4" style={{ padding: "1rem", fontWeight: "bold", color: "#1E3932"}}>
+      <Typography typography="h4" style={{fontWeight: "bold", color: "#1E3932"}}>
         Usuários
+      </Typography>
+      <Typography typography="label" style={{padding: '0 0 1rem 0', color: "#1E3932", fontSize: '.875rem'}}>
+        Gerencie todos os usuários
       </Typography>
       <TableContainer component={Paper} className={styles.users__table}>
         <Box className={styles.users__table__top}>

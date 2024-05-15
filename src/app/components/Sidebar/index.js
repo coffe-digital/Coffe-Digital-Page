@@ -75,13 +75,10 @@ const Sidebar = ({ onMenuClick, isMenuOpen, setIsMenuOpen }) => {
         </ListItemButton>
         <Collapse in={open} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
-            <ListItemButton sx={{ pl: 4 }}>
-              <ListItemText primary="Sobre Nós" className={styles.icon__text}/>
+            <ListItemButton sx={{ pl: 4 }}  onClick={() => {onMenuClick("Sobre"); updateURL("Sobre")}}>
+              <ListItemText primary="Sobre" className={styles.icon__text} />
             </ListItemButton>
-            <ListItemButton sx={{ pl: 4 }}>
-              <ListItemText primary="Produtos" className={styles.icon__text}/>
-            </ListItemButton>
-            <ListItemButton sx={{ pl: 4 }}>
+            <ListItemButton sx={{ pl: 4 }}  onClick={() => {onMenuClick("Contato"); updateURL("Contato")}}>
               <ListItemText primary="Contato" className={styles.icon__text}/>
             </ListItemButton>
           </List>

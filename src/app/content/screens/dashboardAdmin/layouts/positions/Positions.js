@@ -25,6 +25,7 @@ import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import ArticleIcon from "@mui/icons-material/Article";
 import AddIcon from "@mui/icons-material/Add";
+import PositionModal from "@/app/components/Modal/Admin/CreatePosition";
 
 function TablePaginationActions(props) {
   const theme = useTheme();
@@ -111,6 +112,7 @@ export default function Positions() {
   }
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [isPositionModalOpen, setIsPositionModalOpen] = React.useState(false);
 
   // Função para criar um objeto de dados de café
   const createCoffeeData = (
@@ -124,7 +126,7 @@ export default function Positions() {
   const rows = [
     createCoffeeData(
       1,
-      "Admin",
+      "Administrador",
       "Total"
     ),
     createCoffeeData(
@@ -134,7 +136,7 @@ export default function Positions() {
     ),
     createCoffeeData(
       3,
-      "Funcionario",
+      "Funcionário",
       "Edição de páginas"
     ),
     
@@ -152,13 +154,25 @@ export default function Positions() {
     setPage(0);
   };
 
+  const handleOpenPositionModal = () => {
+    setIsPositionModalOpen(true);
+  };
+
+  const handleClosePositionModal = () => {
+    setIsPositionModalOpen(false);
+  };
+
+
   return (
     <Box className={styles.positions}>
       <Typography
         typography="h4"
-        style={{ padding: "1rem", fontWeight: "bold", color: "#1E3932"}}
+        style={{fontWeight: "bold", color: "#1E3932"}}
       >
         Cargos
+      </Typography>
+      <Typography typography="label" style={{padding: '0 0 1rem 0', color: "#1E3932", fontSize: '.875rem'}}>
+        Gerencie todos os seus cargos
       </Typography>
       <TableContainer component={Paper} className={styles.positions__table}>
         <Box className={styles.positions__table__top}>
@@ -181,16 +195,9 @@ export default function Positions() {
           <Box className={styles.positions__table__actions}>
             <Button
               variant="contained"
-              style={{ background: "#4E392A" }}
-              className={styles.positions__search__input}
-            >
-              <ArticleIcon />
-              Gerar Relatório
-            </Button>
-            <Button
-              variant="contained"
               style={{ background: "#1E3932" }}
               className={styles.positions__search__input}
+              onClick={handleOpenPositionModal}
             >
               <AddIcon />
               Novo Cargo
@@ -254,6 +261,8 @@ export default function Positions() {
           </TableFooter>
         </Table>
       </TableContainer>
+       {/* Modal para criar novo cargo */}
+       <PositionModal open={isPositionModalOpen} onClose={handleClosePositionModal} />
     </Box>
   );
 }
