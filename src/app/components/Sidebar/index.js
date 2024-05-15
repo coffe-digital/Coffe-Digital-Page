@@ -19,7 +19,7 @@ import { GrMenu } from "react-icons/gr";
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 
-const Sidebar = ({ onMenuClick }) => {
+const Sidebar = ({ onMenuClick, isMenuOpen, setIsMenuOpen }) => {
 
   const [open, setOpen] = React.useState(true);
 
@@ -27,15 +27,22 @@ const Sidebar = ({ onMenuClick }) => {
     setOpen(!open);
   };
 
+  const handleMenuClick = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+  
   const updateURL = (menuOption) => {
     window.location.hash = menuOption.toLowerCase(); // Atualiza a URL com a opção do menu
   };
 
-
-
   return (
-    <Box bgcolor="primary.main" color="primary.contrastText" width={300} className={styles.sidebar} >
-      <GrMenu className={styles.menu__hamburguer}/>
+    isMenuOpen? 
+    <Box
+      bgcolor="primary.main"
+      color="primary.contrastText"
+      className={`${styles.sidebar} ${isMenuOpen ? styles.sidebarOpen : styles.sidebarClosed}`}
+    >
+      <GrMenu className={styles.menu__hamburguer} onClick={handleMenuClick} style={{cursor: 'pointer'}}/>
       <List className={styles.menu__list}>
         <ListItem button onClick={() => {onMenuClick("Início"); updateURL("Início")}}>
           <AiOutlineUser className={styles.icon} />
@@ -45,6 +52,14 @@ const Sidebar = ({ onMenuClick }) => {
           <BiSolidCoffeeBean className={styles.icon}/>
           <ListItemText primary="Planos" className={styles.icon__text} />
         </ListItem>
+        <ListItem button onClick={() => {onMenuClick("Clientes"); updateURL("Clientes")}}>
+          <PiUsersFour className={styles.icon}/>
+          <ListItemText primary="Clientes" className={styles.icon__text}/>
+        </ListItem>
+        <ListItem button onClick={() => {onMenuClick("Produtos"); updateURL("Produtos")}}>
+          <BsBoxSeam className={styles.icon}/>
+          <ListItemText primary="Produtos" className={styles.icon__text}/>
+        </ListItem>
         <ListItem button onClick={() => {onMenuClick("Usuários"); updateURL("Usuários")}}>
           <FaUsers className={styles.icon} />
           <ListItemText primary="Usuários" className={styles.icon__text}/>
@@ -53,15 +68,6 @@ const Sidebar = ({ onMenuClick }) => {
           <BsPersonVcardFill className={styles.icon}/>
           <ListItemText primary="Cargos" className={styles.icon__text}/>
         </ListItem>
-        <ListItem button onClick={() => {onMenuClick("Produtos"); updateURL("Produtos")}}>
-          <BsBoxSeam className={styles.icon}/>
-          <ListItemText primary="Produtos" className={styles.icon__text}/>
-        </ListItem>
-        <ListItem button onClick={() => {onMenuClick("Clientes"); updateURL("Clientes")}}>
-          <PiUsersFour className={styles.icon}/>
-          <ListItemText primary="Clientes" className={styles.icon__text}/>
-        </ListItem>
-
         <ListItemButton onClick={handleClick}>
           <RiPagesLine className={styles.icon}/>
           <ListItemText primary="Páginas" className={styles.icon__text}/>
@@ -80,6 +86,40 @@ const Sidebar = ({ onMenuClick }) => {
             </ListItemButton>
           </List>
         </Collapse>
+      </List>
+    </Box>:
+    <Box
+      bgcolor="primary.main"
+      color="primary.contrastText"
+      className={`${styles.sidebar_compressed}`}
+    >
+      <GrMenu className={styles.menu__hamburguer__compressed} onClick={handleMenuClick} style={{cursor: 'pointer'}}/>
+      <List className={styles.menu__list}>
+        <ListItem button onClick={() => {onMenuClick("Início"); updateURL("Início")}}>
+          <AiOutlineUser className={styles.icon} />
+        </ListItem>
+        <ListItem button onClick={() => {onMenuClick("Planos"); updateURL("Planos")}}>
+          <BiSolidCoffeeBean className={styles.icon}/>
+        </ListItem>
+        <ListItem button onClick={() => {onMenuClick("Clientes"); updateURL("Clientes")}}>
+          <PiUsersFour className={styles.icon}/>
+        </ListItem>
+        <ListItem button onClick={() => {onMenuClick("Produtos"); updateURL("Produtos")}}>
+          <BsBoxSeam className={styles.icon}/>
+        </ListItem>
+        <ListItem button onClick={() => {onMenuClick("Usuários"); updateURL("Usuários")}}>
+          <FaUsers className={styles.icon} />
+        
+        </ListItem>
+        <ListItem button onClick={() => {onMenuClick("Cargos"); updateURL("Cargos")}}>
+          <BsPersonVcardFill className={styles.icon}/>
+        
+        </ListItem>
+        
+       
+
+      
+       
       </List>
     </Box>
   );

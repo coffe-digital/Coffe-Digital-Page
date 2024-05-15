@@ -1,13 +1,37 @@
 .topbar{
     width: 100%;
     margin: 0 auto;
-    height: 60px;
+    height: 70px;
     background-color: #1E3932;
+    display: grid;
+    grid-template-columns: 4fr 1fr 1fr;
+    box-sizing: border-box;
+    box-shadow: 1px 2px 2px 1px #919191;
 }
 
-.topbar__boxLogo{
-    padding: 1.4rem;
+
+.topbar__boxUser{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    margin-left: 5rem;
 }
+
+.topbar__boxUser svg{
+    object-fit: cover;
+}
+
+.topbar__boxLogout{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+   
+}
+
 
 .topbar__icon{
     width: 100px;

@@ -3,7 +3,7 @@ import styles from "./home.module.css";
 export default function Home() {
   return (
     <main className={styles.main}>
-      CoffeCode
+      Em manutenção
     </main>
   );
 }
