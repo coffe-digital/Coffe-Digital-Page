@@ -15,6 +15,7 @@ import {
   TableRow,
   TextField,
   Typography,
+  Tooltip
 } from "@mui/material";
 
 import styles from "./users.module.css";
@@ -27,6 +28,7 @@ import LastPageIcon from "@mui/icons-material/LastPage";
 import ArticleIcon from '@mui/icons-material/Article';
 import AddIcon from '@mui/icons-material/Add';
 import CreateUserModal from "@/app/components/Modal/Admin/CreateUserModal";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 function TablePaginationActions(props) {
   const theme = useTheme();
@@ -107,23 +109,23 @@ export function CustomPaginationActionsTable() {
   };
 }
 export default function Users() {
-  function createData(id, name, email, password, position) {
-    return { id, name, email, password, position };
+  function createData(id, name, email, position) {
+    return { id, name, email, position };
   }
 
   const [isCreateUserModalOpen, setIsCreateUserModalOpen] = useState(false); 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const rows = [
-    createData(1,"João Silva", "joao.silva@example.com",  "Funcionário"),
-    createData(2, "Maria Santos", "maria.santos@example.com", "Admin"),
-    createData(3, "Pedro Oliveira", "pedro.oliveira@example.com", "Cliente"),
-    createData(4, "Ana Costa", "ana.costa@example.com", "Estoque"),
-    createData(5, "Laura Ferreira", "laura.ferreira@example.com", "Admin"),
-    createData(6, "Carlos Martins", "carlos.martins@example.com", "Estoque"),
+    createData(1,"João Silva", "joao.silva@example.com",  "Administrador"),
+    createData(2, "Maria Santos", "maria.santos@example.com", "Funcionário"),
+    createData(3, "Pedro Oliveira", "pedro.oliveira@example.com", "Funcionário"),
+    createData(4, "Ana Costa", "ana.costa@example.com", "Funcionário"),
+    createData(5, "Laura Ferreira", "laura.ferreira@example.com", "Funcionário"),
+    createData(6, "Carlos Martins", "carlos.martins@example.com", "Funcionário"),
     createData(7, "Camila Almeida", "camila.almeida@example.com", "Funcionário"),
     createData(8, "Rafael Sousa", "rafael.sousa@example.com", "Funcionário"),
-    createData(9, "Fernanda Lima", "fernanda.lima@example.com", "Admin")
+    createData(9, "Fernanda Lima", "fernanda.lima@example.com", "Funcionário")
 
   ].sort((a, b) => (a.id < b.id ? -1 : 1));
 
@@ -173,16 +175,19 @@ export default function Users() {
                 </Button>
             </Box>
         </Box>
-        <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
+        <Table aria-label="custom pagination table">
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>ID</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Nome</TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+              <TableCell sx={{ fontWeight: "bold" }}  align="left">ID</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }} align="left" >Nome</TableCell>
+              <TableCell align="left" sx={{ fontWeight: "bold" }}>
                 E-mail
               </TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+              <TableCell align="left" sx={{ fontWeight: "bold" }}>
                 Cargo
+              </TableCell>
+              <TableCell align="left" sx={{ fontWeight: "bold" }}>
+                Ação
               </TableCell>
             </TableRow>
           </TableHead>
@@ -192,23 +197,36 @@ export default function Users() {
               : rows
             ).map((row) => (
               <TableRow key={row.name}>
-                <TableCell component="th" scope="row">
+                <TableCell component="th" scope="row" align="left">
                   {row.id}
                 </TableCell>
-                <TableCell component="th" scope="row">
+                <TableCell component="th" scope="row" align="left">
                   {row.name}
                 </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
+                <TableCell  align="left">
                   {row.email}
                 </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
+                <TableCell align="left">
                   {row.position}
+                </TableCell>
+                <TableCell>
+                <Tooltip title="Editar usuário">
+                    <span>
+                    <FaEdit style={{ cursor: "pointer" }} />{" "}
+                    </span>
+                  </Tooltip>
+                
+                  <Tooltip title="Excluir usuário">
+                    <span>
+                      <FaTrash style={{ cursor: "pointer" }} color="red" />
+                    </span>
+                  </Tooltip>
                 </TableCell>
               </TableRow>
             ))}
             {emptyRows > 0 && (
               <TableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={6} />
+                <TableCell colSpan={4} />
               </TableRow>
             )}
           </TableBody>
@@ -216,7 +234,7 @@ export default function Users() {
             <TableRow>
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25, { label: "Todos", value: -1 }]}
-                colSpan={6}
+                colSpan={4}
                 count={rows.length}
                 rowsPerPage={rowsPerPage}
                 page={page}

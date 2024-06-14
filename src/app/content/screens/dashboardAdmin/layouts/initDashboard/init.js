@@ -20,8 +20,9 @@ import FirstPageIcon from "@mui/icons-material/FirstPage";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
-import CoffeInital from '../../../../../../../public/icons/dashboardImages/coffe-initial.png'
+import CoffeInital from "../../../../../../../public/icons/dashboardImages/coffe-initial.png";
 import Image from "next/image";
+import { GiCoffeeBeans } from "react-icons/gi";
 
 function TablePaginationActions(props) {
   const theme = useTheme();
@@ -88,7 +89,6 @@ function TablePaginationActions(props) {
 export function CustomPaginationActionsTable() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
 
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
@@ -199,6 +199,7 @@ export default function Init() {
     <Box className={styles.init}>
       <Box className={styles.init__top}>
         <Box className={styles.init__top__brown_1}>
+          
         </Box>
         <Box className={styles.init__top__brown_2}></Box>
         <Box className={styles.init__top__brown_3}></Box>
@@ -215,22 +216,12 @@ export default function Init() {
           <TableHead>
             <TableRow>
               <TableCell style={{ fontWeight: "bold" }}>ID</TableCell>
-              <TableCell style={{ fontWeight: "bold" }} >Nome</TableCell>
-              <TableCell  style={{ fontWeight: "bold" }}>
-                Categoria
-              </TableCell>
-              <TableCell  style={{ fontWeight: "bold" }}>
-                Marca
-              </TableCell>
-              <TableCell  style={{ fontWeight: "bold" }}>
-                Descrição
-              </TableCell>
-              <TableCell  style={{ fontWeight: "bold" }}>
-                Quantidade
-              </TableCell>
-              <TableCell  style={{ fontWeight: "bold" }}>
-                Valor
-              </TableCell>
+              <TableCell style={{ fontWeight: "bold" }}>Nome</TableCell>
+              <TableCell style={{ fontWeight: "bold" }}>Categoria</TableCell>
+              <TableCell style={{ fontWeight: "bold" }}>Marca</TableCell>
+              <TableCell style={{ fontWeight: "bold" }}>Descrição</TableCell>
+              <TableCell style={{ fontWeight: "bold" }}>Quantidade</TableCell>
+              <TableCell style={{ fontWeight: "bold" }}>Valor</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -258,7 +249,10 @@ export default function Init() {
                   {row.quantidade}
                 </TableCell>
                 <TableCell style={{ width: 160 }} align="left">
-                  {(row.valor).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}
+                  {row.valor.toLocaleString("pt-br", {
+                    style: "currency",
+                    currency: "BRL",
+                  })}
                 </TableCell>
               </TableRow>
             ))}

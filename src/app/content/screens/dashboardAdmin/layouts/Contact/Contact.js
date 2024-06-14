@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import styles from "./Contact.module.css";
-import FroalaEditorComponent from "react-froala-wysiwyg";
+import 'froala-editor/css/froala_style.min.css';
 
 export default function Contact() {
   const [contactName, setContactName] = useState("");
@@ -58,16 +58,8 @@ export default function Contact() {
           onChange={(e) => setEmail(e.target.value)}
         />
         <Typography sx={{ marginTop: '1rem', fontSize: '.875rem' }}>Descrição</Typography>
-        <FroalaEditorComponent
-          tag='textarea'
-          config={{
-            placeholder: 'Edite a descrição aqui',
-            charCounterCount: true
-          }}
-          model={description}
-          onModelChange={(value) => setDescription(value)}
-          className={styles.froalaEditor}
-        />
+       
+       
         <TextField
           fullWidth
           margin="normal"

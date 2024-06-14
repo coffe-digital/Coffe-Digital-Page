@@ -15,6 +15,7 @@ import {
   TableRow,
   TextField,
   Typography,
+  Tooltip
 } from "@mui/material";
 
 import styles from "./Clients.module.css";
@@ -191,22 +192,22 @@ export default function Clients() {
             <TableRow>
               <TableCell sx={{ fontWeight: "bold" }}>ID</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Nome</TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+              <TableCell align="left" sx={{ fontWeight: "bold" }}>
                 CPF
               </TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+              <TableCell align="left" sx={{ fontWeight: "bold" }}>
                 Telefone
               </TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+              <TableCell align="left" sx={{ fontWeight: "bold" }}>
                 Data de nascimento
               </TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+              <TableCell align="left" sx={{ fontWeight: "bold" }}>
                 Endereço
               </TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+              <TableCell align="left" sx={{ fontWeight: "bold" }}>
                 Email
               </TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+              <TableCell align="left" sx={{ fontWeight: "bold" }}>
                 Ação
               </TableCell>
             </TableRow>
@@ -223,24 +224,33 @@ export default function Clients() {
                 <TableCell component="th" scope="row">
                   {row.name}
                 </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
+                <TableCell style={{ width: 160 }} align="left">
                   {row.cpf}
                 </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
+                <TableCell style={{ width: 160 }} align="left">
                   {row.phone}
                 </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
+                <TableCell style={{ width: 160 }} align="left">
                   {row.birthdate}
                 </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
+                <TableCell style={{ width: 160 }} align="left">
                   {row.adress}
                 </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
+                <TableCell style={{ width: 160 }} align="left">
                   {row.email}
                 </TableCell>
                 <TableCell>
-                  <FaEdit style={{cursor: 'pointer'}} /> {/* Ícone de editar */}
-                  <FaTrash style={{cursor: 'pointer'}} color="red"/> {/* Ícone de excluir */}
+                <Tooltip title="Editar cliente">
+                    <span>
+                    <FaEdit style={{ cursor: "pointer" }} />{" "}
+                    </span>
+                  </Tooltip>
+                
+                  <Tooltip title="Excluir cliente">
+                    <span>
+                      <FaTrash style={{ cursor: "pointer" }} color="red" />
+                    </span>
+                  </Tooltip>
                 </TableCell>
        
                 

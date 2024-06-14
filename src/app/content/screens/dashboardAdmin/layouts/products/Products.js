@@ -14,6 +14,7 @@ import {
   TablePagination,
   TableRow,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 
@@ -28,6 +29,7 @@ import ArticleIcon from "@mui/icons-material/Article";
 import AddIcon from "@mui/icons-material/Add";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import ProductModal from "@/app/components/Modal/Admin/CreateProductsModal";
+import ReportModal from "@/app/components/Modal/Admin/ReportModal";
 
 function TablePaginationActions(props) {
   const theme = useTheme();
@@ -114,7 +116,8 @@ export default function Products() {
   }
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [isProductModalOpen, setIsProductModalOpen] = useState(false); 
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   // Função para criar um objeto de dados de café
   const createCoffeeData = (
     id,
@@ -207,25 +210,35 @@ export default function Products() {
   };
 
   const handleOpenCreateProductModal = () => {
-    console.log(isProductModalOpen)
+    console.log(isProductModalOpen);
     setIsProductModalOpen(true);
   };
 
   const handleCloseProductModal = () => {
     setIsProductModalOpen(false);
   };
- 
+
+  const handleOpenReportModal = () => {
+    setIsReportModalOpen(true);
+  };
+
+  const handleCloseReportModal = () => {
+    setIsReportModalOpen(false);
+  };
 
   return (
     <Box className={styles.product}>
       <Typography
         typography="h4"
-        style={{fontWeight: "bold", color: "#1E3932"}}
+        style={{ fontWeight: "bold", color: "#1E3932" }}
       >
         Produtos
       </Typography>
 
-      <Typography typography="label" style={{padding: '0 0 1rem 0', color: "#1E3932", fontSize: '.875rem'}}>
+      <Typography
+        typography="label"
+        style={{ padding: "0 0 1rem 0", color: "#1E3932", fontSize: ".875rem" }}
+      >
         Gerencie todos os seus produtos
       </Typography>
       <TableContainer component={Paper} className={styles.product__table}>
@@ -251,6 +264,7 @@ export default function Products() {
               variant="contained"
               style={{ background: "#4E392A" }}
               className={styles.product__search__input}
+              onClick={handleOpenReportModal}
             >
               <ArticleIcon />
               Gerar Relatório
@@ -271,22 +285,22 @@ export default function Products() {
             <TableRow>
               <TableCell sx={{ fontWeight: "bold" }}>ID</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Nome</TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+              <TableCell align="left" sx={{ fontWeight: "bold" }}>
                 Categoria
               </TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+              <TableCell align="left" sx={{ fontWeight: "bold" }}>
                 Marca
               </TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+              <TableCell align="left" sx={{ fontWeight: "bold" }}>
                 Descrição
               </TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+              <TableCell align="left" sx={{ fontWeight: "bold" }}>
                 Quantidade
               </TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+              <TableCell align="left" sx={{ fontWeight: "bold" }}>
                 Valor
               </TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+              <TableCell align="left" sx={{ fontWeight: "bold" }}>
                 Ação
               </TableCell>
             </TableRow>
@@ -303,24 +317,36 @@ export default function Products() {
                 <TableCell component="th" scope="row">
                   {row.nome}
                 </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
+                <TableCell style={{ width: 160 }} align="left">
                   {row.categoria}
                 </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
+                <TableCell style={{ width: 160 }} align="left">
                   {row.marca}
                 </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
+                <TableCell style={{ width: 160 }} align="left">
                   {row.descricao}
                 </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
+                <TableCell style={{ width: 160 }} align="left">
                   {row.quantidade}
                 </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
-                  {(row.valor).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}
+                <TableCell style={{ width: 160 }} align="left">
+                  {row.valor.toLocaleString("pt-br", {
+                    style: "currency",
+                    currency: "BRL",
+                  })}
                 </TableCell>
                 <TableCell>
-                  <FaEdit style={{cursor: 'pointer'}} /> {/* Ícone de editar */}
-                  <FaTrash style={{cursor: 'pointer'}} color="red"/> {/* Ícone de excluir */}
+                  <Tooltip title="Editar produto">
+                    <span>
+                      <FaEdit style={{ cursor: "pointer" }} />{" "}
+                    </span>
+                  </Tooltip>
+
+                  <Tooltip title="Excluir produto">
+                    <span>
+                      <FaTrash style={{ cursor: "pointer" }} color="red" />
+                    </span>
+                  </Tooltip>
                 </TableCell>
               </TableRow>
             ))}
@@ -354,8 +380,14 @@ export default function Products() {
           </TableFooter>
         </Table>
       </TableContainer>
-        {/* Modal para criar produto */}
-        <ProductModal open={isProductModalOpen} onClose={handleCloseProductModal} />
+      {/* Modal para criar produto */}
+      <ProductModal
+        open={isProductModalOpen}
+        onClose={handleCloseProductModal}
+      />
+
+      {/* Modal para gerar relatório */}
+      <ReportModal open={isReportModalOpen} onClose={handleCloseReportModal} />
     </Box>
   );
 }

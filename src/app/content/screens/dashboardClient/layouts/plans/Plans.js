@@ -14,6 +14,7 @@ import {
   TablePagination,
   TableRow,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 
@@ -24,9 +25,9 @@ import FirstPageIcon from "@mui/icons-material/FirstPage";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
-import ArticleIcon from '@mui/icons-material/Article';
-import { FaEdit, FaTrash } from 'react-icons/fa';
-import AddIcon from '@mui/icons-material/Add';
+import ArticleIcon from "@mui/icons-material/Article";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import AddIcon from "@mui/icons-material/Add";
 import PlanModal from "@/app/components/Modal/Admin/PlanModal";
 import ReportModal from "@/app/components/Modal/Admin/ReportModal";
 
@@ -108,18 +109,18 @@ export function CustomPaginationActionsTable() {
     setPage(0);
   };
 }
-export default function Plans() {
+export default function PlansClient() {
   function createData(name, description, value, status) {
-    return {name, description, value, status};
+    return { name, description, value, status };
   }
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [isPlanModalOpen, setIsPlanModalOpen] = useState(false); 
-  const [isReportModalOpen, setIsReportModalOpen] = useState(false); 
+  const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const rows = [
-    createData("Plano Iniciante", "Descrição", "Ativo", 29.90),
-    createData("Plano Premium", "Descrição", "Ativo", 49.90),
-    createData("Plano Café do Mês", "Descrição", "Ativo", 119.90),
+    createData("Plano Iniciante", "Descrição", "Ativo", 29.9),
+    createData("Plano Premium", "Descrição", "Ativo", 49.9),
+    createData("Plano Café do Mês", "Descrição", "Ativo", 119.9),
   ].sort((a, b) => (a.calories < b.calories ? -1 : 1));
 
   const emptyRows =
@@ -150,38 +151,48 @@ export default function Plans() {
     setIsReportModalOpen(false);
   };
 
-
   return (
     <Box className={styles.plans}>
-      
-      <Typography typography="h4" style={{ padding: "1rem", fontWeight: "bold", color: "#1E3932"}}>
-        Planos
+      <Typography
+        typography="h4"
+        style={{ fontWeight: "bold", color: "#1E3932" }}
+      >
+        Meus Planos de Assinatura
+      </Typography>
+
+      <Typography
+        typography="label"
+        style={{ padding: "0 0 1rem 0", color: "#1E3932", fontSize: ".875rem" }}
+      >
+        Visuzalide todos os seus planos atuais
       </Typography>
       <TableContainer component={Paper} className={styles.plans__table}>
         <Box className={styles.plans__table__top}>
-            <Box className={styles.plans__table__search}>
-                <TextField maxRows="1" id="outlined-basic" label="Pesquise os planos" variant="outlined" className={styles.plans__table__input} />
-                <Button style={{background: '#D9D9D9', color: '#000'}} variant="contained" className={styles.plans__table__button}>Pesquisar</Button>
-            </Box>
-            <Box className={styles.plans__table__actions}>
-                <Button variant="contained" style={{background: '#4E392A'}} className={styles.plans__search__input} onClick={handleOpenReportModal}>
-                    <ArticleIcon/>
-                    Gerar Relatório
-                </Button>
-                <Button variant="contained" style={{background: '#1E3932'}} className={styles.plans__search__input} onClick={handleOpenPlanModal}>
-                    <AddIcon/>
-                    Novo Plano
-                </Button>
-            </Box>
+          <Box className={styles.plans__table__search}>
+            <TextField
+              maxRows="1"
+              id="outlined-basic"
+              label="Pesquise os planos"
+              variant="outlined"
+              className={styles.plans__table__input}
+            />
+            <Button
+              style={{ background: "#D9D9D9", color: "#000" }}
+              variant="contained"
+              className={styles.plans__table__button}
+            >
+              Pesquisar
+            </Button>
+          </Box>
         </Box>
         <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
           <TableHead>
-            <TableRow>  
-              <TableCell sx={{fontWeight: 'bold'}}>Nome</TableCell>
-              <TableCell  sx={{fontWeight: 'bold'}}>Descrição</TableCell>
-              <TableCell sx={{fontWeight: 'bold'}} >Status</TableCell>
-              <TableCell sx={{fontWeight: 'bold'}}>Valor</TableCell>
-              <TableCell sx={{fontWeight: 'bold'}}>Ação</TableCell>
+            <TableRow>
+              <TableCell sx={{ fontWeight: "bold" }}>Nome</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Descrição</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Status</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Valor</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Ações</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -193,18 +204,28 @@ export default function Plans() {
                 <TableCell component="th" scope="row">
                   {row.name}
                 </TableCell>
-                <TableCell >
-                  {row.description}
-                </TableCell>
+                <TableCell>{row.description}</TableCell>
                 <TableCell>
-                  {(row.value).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}
+                  {row.value.toLocaleString("pt-br", {
+                    style: "currency",
+                    currency: "BRL",
+                  })}
                 </TableCell>
+                <TableCell>{row.status}</TableCell>
                 <TableCell>
-                  {row.status}
-                </TableCell>
-                <TableCell>
-                  <FaEdit style={{cursor: 'pointer'}} /> {/* Ícone de editar */}
-                  <FaTrash style={{cursor: 'pointer'}} color="red"/> {/* Ícone de excluir */}
+                 
+                  <Tooltip title="Editar plano">
+                    <span>
+                    <FaEdit style={{ cursor: "pointer" }} />{" "}
+                    </span>
+                  </Tooltip>
+                
+                  <Tooltip title="Cancelar plano">
+                    <span>
+                      <FaTrash style={{ cursor: "pointer" }} color="red" />
+                    </span>
+                  </Tooltip>
+
                 </TableCell>
               </TableRow>
             ))}

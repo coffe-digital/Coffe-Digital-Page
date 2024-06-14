@@ -16,6 +16,7 @@ const CreateUserModal = ({ open, onClose }) => {
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [userPassword, setUserPassword] = useState("");
+  const [position, setPosition] = useState("");
 
   const handleCreateUser = () => {
     UserAPI.createUser({
@@ -58,6 +59,16 @@ const CreateUserModal = ({ open, onClose }) => {
           value={userName}
           onChange={(e) => setUserName(e.target.value)}
         />
+         <FormControl fullWidth margin="normal">
+          <InputLabel>Cargo</InputLabel>
+          <Select
+            value={position}
+            onChange={(e) => setPosition(e.target.value)}
+          >
+            <MenuItem value="Administrador">Administrador</MenuItem>
+            <MenuItem value="Funcionário">Funcionário</MenuItem>
+          </Select>
+        </FormControl>
         <TextField
           label="E-mail"
           fullWidth

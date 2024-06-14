@@ -16,6 +16,7 @@ const PlanModal = ({ open, onClose }) => {
   const [planDescription, setPlanDescription] = useState("");
   const [planValue, setPlanValue] = useState("");
   const [planStatus, setPlanStatus] = useState("");
+  const [planType, setPlantype] = useState("");
 
   const handleCreatePlan = () => {
     console.log("Novo plano criado:", { planName, planDescription, planValue, planStatus });
@@ -47,13 +48,7 @@ const PlanModal = ({ open, onClose }) => {
           value={planName}
           onChange={(e) => setPlanName(e.target.value)}
         />
-        <TextField
-          label="Descrição"
-          fullWidth
-          margin="normal"
-          value={planDescription}
-          onChange={(e) => setPlanDescription(e.target.value)}
-        />
+        
         <TextField
           label="Valor"
           fullWidth
@@ -61,6 +56,17 @@ const PlanModal = ({ open, onClose }) => {
           value={planValue}
           onChange={(e) => setPlanValue(e.target.value)}
         />
+        <FormControl fullWidth margin="normal">
+          <InputLabel>Tipo</InputLabel>
+          <Select
+            value={planType}
+            onChange={(e) => setPlantype(e.target.value)}
+          >
+            <MenuItem value="Mensal">Mensal</MenuItem>
+            <MenuItem value="Semestral">Semestral</MenuItem>
+            <MenuItem value="Anual">Anual</MenuItem>
+          </Select>
+        </FormControl>
         <FormControl fullWidth margin="normal">
           <InputLabel>Status</InputLabel>
           <Select
@@ -71,6 +77,13 @@ const PlanModal = ({ open, onClose }) => {
             <MenuItem value="Inativo">Inativo</MenuItem>
           </Select>
         </FormControl>
+        <TextField
+          label="Descrição"
+          fullWidth
+          margin="normal"
+          value={planDescription}
+          onChange={(e) => setPlanDescription(e.target.value)}
+        />
         <Box sx={{ mt: 2 }}>
           <Button variant="contained" color="success" onClick={handleCreatePlan}>
             Criar Plano

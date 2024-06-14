@@ -1,4 +1,5 @@
 import React from "react";
+import { useState } from "react";
 import {
   Box,
   Button,
@@ -26,6 +27,7 @@ import LastPageIcon from "@mui/icons-material/LastPage";
 import ArticleIcon from "@mui/icons-material/Article";
 import AddIcon from "@mui/icons-material/Add";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import ProductModal from "@/app/components/Modal/Admin/CreateProductsModal";
 
 function TablePaginationActions(props) {
   const theme = useTheme();
@@ -106,13 +108,13 @@ export function CustomPaginationActionsTable() {
     setPage(0);
   };
 }
-export default function Products() {
+export default function ProductsClient() {
   function createData(name, calories, fat) {
     return { name, calories, fat };
   }
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false); 
   // Função para criar um objeto de dados de café
   const createCoffeeData = (
     id,
@@ -133,7 +135,7 @@ export default function Products() {
       "Café",
       "Marca A",
       "Descrição do café de Avelã",
-      150,
+      3,
       3.7
     ),
     createCoffeeData(
@@ -142,7 +144,7 @@ export default function Products() {
       "Café",
       "Marca B",
       "Descrição do café de Baunilha",
-      150,
+      1,
       25.0
     ),
     createCoffeeData(
@@ -151,45 +153,11 @@ export default function Products() {
       "Café",
       "Marca C",
       "Descrição do café de Caramelo",
-      150,
+      1,
       16.0
     ),
-    createCoffeeData(
-      4,
-      "Café 150g - Tradicional",
-      "Café",
-      "Marca D",
-      "Descrição do café Tradicional",
-      150,
-      6.0
-    ),
-    createCoffeeData(
-      5,
-      "Capuccino - Caseiro",
-      "Capuccino",
-      "Marca E",
-      "Descrição do Capuccino Caseiro",
-      250,
-      16.0
-    ),
-    createCoffeeData(
-      6,
-      "Capuccino - Expresso",
-      "Capuccino",
-      "Marca F",
-      "Descrição do Capuccino Expresso",
-      250,
-      3.2
-    ),
-    createCoffeeData(
-      7,
-      "Café 200g - Tradicional",
-      "Café",
-      "Marca G",
-      "Descrição do café Tradicional",
-      200,
-      9.0
-    ),
+   
+   
   ].sort((a, b) => (a.quantidade < b.quantidade ? -1 : 1));
 
   const emptyRows =
@@ -204,13 +172,27 @@ export default function Products() {
     setPage(0);
   };
 
+  const handleOpenCreateProductModal = () => {
+    console.log(isProductModalOpen)
+    setIsProductModalOpen(true);
+  };
+
+  const handleCloseProductModal = () => {
+    setIsProductModalOpen(false);
+  };
+ 
+
   return (
     <Box className={styles.product}>
       <Typography
         typography="h4"
-        style={{ padding: "1rem", fontWeight: "bold", color: "#1E3932"}}
+        style={{fontWeight: "bold", color: "#1E3932"}}
       >
-        Produtos
+        Meus Produtos
+      </Typography>
+
+      <Typography typography="label" style={{padding: '0 0 1rem 0', color: "#1E3932", fontSize: '.875rem'}}>
+        Visualize seus produtos já adquiridos conosco
       </Typography>
       <TableContainer component={Paper} className={styles.product__table}>
         <Box className={styles.product__table__top}>
@@ -230,47 +212,26 @@ export default function Products() {
               Pesquisar
             </Button>
           </Box>
-          <Box className={styles.product__table__actions}>
-            <Button
-              variant="contained"
-              style={{ background: "#4E392A" }}
-              className={styles.product__search__input}
-            >
-              <ArticleIcon />
-              Gerar Relatório
-            </Button>
-            <Button
-              variant="contained"
-              style={{ background: "#1E3932" }}
-              className={styles.product__search__input}
-            >
-              <AddIcon />
-              Novo Produto
-            </Button>
-          </Box>
         </Box>
         <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
           <TableHead>
             <TableRow>
               <TableCell sx={{ fontWeight: "bold" }}>ID</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Nome</TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+              <TableCell align="left" sx={{ fontWeight: "bold" }}>
                 Categoria
               </TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+              <TableCell align="left" sx={{ fontWeight: "bold" }}>
                 Marca
               </TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+              <TableCell align="left" sx={{ fontWeight: "bold" }}>
                 Descrição
               </TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+              <TableCell align="left" sx={{ fontWeight: "bold" }}>
                 Quantidade
               </TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+              <TableCell align="left" sx={{ fontWeight: "bold" }}>
                 Valor
-              </TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                Ação
               </TableCell>
             </TableRow>
           </TableHead>
@@ -286,24 +247,20 @@ export default function Products() {
                 <TableCell component="th" scope="row">
                   {row.nome}
                 </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
+                <TableCell style={{ width: 160 }} align="left">
                   {row.categoria}
                 </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
+                <TableCell style={{ width: 160 }} align="left">
                   {row.marca}
                 </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
+                <TableCell style={{ width: 160 }} align="left">
                   {row.descricao}
                 </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
+                <TableCell style={{ width: 160 }} align="left">
                   {row.quantidade}
                 </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
+                <TableCell style={{ width: 160 }} align="left">
                   {(row.valor).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}
-                </TableCell>
-                <TableCell>
-                  <FaEdit style={{cursor: 'pointer'}} /> {/* Ícone de editar */}
-                  <FaTrash style={{cursor: 'pointer'}} color="red"/> {/* Ícone de excluir */}
                 </TableCell>
               </TableRow>
             ))}
@@ -337,6 +294,8 @@ export default function Products() {
           </TableFooter>
         </Table>
       </TableContainer>
+        {/* Modal para criar produto */}
+        <ProductModal open={isProductModalOpen} onClose={handleCloseProductModal} />
     </Box>
   );
 }

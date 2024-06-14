@@ -28,6 +28,10 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
+    gap: 1rem;
+    box-shadow: 1px 1px 2px 2px #ccc;
+    padding: .4rem;
+    box-sizing: border-box;
 
 }
 
@@ -45,10 +49,14 @@
 
 .init__top__brown_2{
     background-color: #927d6d;
+    box-shadow: 1px 1px 2px 2px #ccc;
+
 }
 
 .init__top__brown_3{
     background-color: #9c9086;
+    box-shadow: 1px 1px 2px 2px #ccc;
+
 }
 
 .init__table{

@@ -13,6 +13,7 @@ import {
   TablePagination,
   TableRow,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 
@@ -26,6 +27,7 @@ import LastPageIcon from "@mui/icons-material/LastPage";
 import ArticleIcon from "@mui/icons-material/Article";
 import AddIcon from "@mui/icons-material/Add";
 import PositionModal from "@/app/components/Modal/Admin/CreatePosition";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 function TablePaginationActions(props) {
   const theme = useTheme();
@@ -209,8 +211,11 @@ export default function Positions() {
             <TableRow>
               <TableCell sx={{ fontWeight: "bold" }}>ID</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Nome</TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold" }}>
+              <TableCell align="left" sx={{ fontWeight: "bold" }}>
                 Permissão
+              </TableCell>
+              <TableCell align="left" sx={{ fontWeight: "bold" }}>
+                Ações
               </TableCell>
             </TableRow>
           </TableHead>
@@ -226,14 +231,27 @@ export default function Positions() {
                 <TableCell component="th" scope="row">
                   {row.nome}
                 </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
+                <TableCell  align="left">
                   {row.permissao}
+                </TableCell>
+                <TableCell>
+                <Tooltip title="Editar cargo">
+                    <span>
+                    <FaEdit style={{ cursor: "pointer" }} />{" "}
+                    </span>
+                  </Tooltip>
+                
+                  <Tooltip title="Excluir cargo">
+                    <span>
+                      <FaTrash style={{ cursor: "pointer" }} color="red" />
+                    </span>
+                  </Tooltip>
                 </TableCell>
               </TableRow>
             ))}
             {emptyRows > 0 && (
               <TableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={6} />
+                <TableCell colSpan={4} />
               </TableRow>
             )}
           </TableBody>
@@ -241,7 +259,7 @@ export default function Positions() {
             <TableRow>
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25, { label: "Todos", value: -1 }]}
-                colSpan={7}
+                colSpan={4}
                 count={rows.length}
                 rowsPerPage={rowsPerPage}
                 page={page}

@@ -1,8 +1,7 @@
 
-import ScreenDashboard from "@/app/content/screens/dashboard/index";
+import ScreenDashboard from "@/app/content/screens/dashboardAdmin";
 
-export default function Dashboard() {
-  return (
-    <ScreenDashboard/>
-  );
+export default function DashboardContainer() {
+  return <ScreenDashboard/>
+
 }

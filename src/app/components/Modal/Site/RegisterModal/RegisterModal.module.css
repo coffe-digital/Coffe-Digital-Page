@@ -1,0 +1,51 @@
+.dialogPaper {
+    width: 30%;
+    border-radius: 0px;
+  }
+  
+  .dialogTitle {
+    background-color: #4E392A;
+    color: white;
+    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .closeButton {
+    color: white;
+    margin-right: auto;
+  }
+  
+  .dialogContent {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: -2rem;
+  }
+
+  .links {
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+    align-items: initial;
+    margin-top: 10px;
+    text-align: left;
+  }
+  
+  .link {
+    color: #4E392A;
+    text-align: left;
+    cursor: pointer;
+    align-self: initial;
+    text-transform: none;
+    padding: 0.5rem ;
+  }
+
+.button{
+    background-color:#1E3932;
+}
+
+.button:hover{
+    background-color:#101f1b;
+}

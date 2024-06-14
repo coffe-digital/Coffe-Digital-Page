@@ -19,12 +19,12 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    width: 55%;
+    width: 100%;
     gap: 1rem;
 }
 
 .plans__table__input{
-    width: 80%;
+    width: 100%;
 }
 
 .plans__table__actions{
