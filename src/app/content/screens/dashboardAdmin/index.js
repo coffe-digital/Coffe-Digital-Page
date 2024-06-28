@@ -7,13 +7,13 @@ import Products from "./layouts/products/Products";
 import Plans from "./layouts/plans/Plans";
 import Users from "./layouts/users/Users";
 import Positions from "./layouts/positions/Positions";
-
 import Clients from "./layouts/clients/Clients";
 import About from "./layouts/aboutUs/About";
 import Contact from "./layouts/Contact/Contact";
 import SidebarAdmin from "@/app/components/Sidebar/admin";
 import CategoriesProducts from "./layouts/categoriesProducts";
 import ProfileAdmin from "./layouts/profile/ProfileAdmin";
+import Permissions from "./layouts/permissions";
 
 export default function ScreenDashboardAdmin() {
 
@@ -36,6 +36,7 @@ export default function ScreenDashboardAdmin() {
     Planos: <Plans/>,
     Usuários: <Users/>,
     Cargos: <Positions />,
+    Permissões: <Permissions/>,
     Clientes: <Clients />,
     Sobre: <About/>,
     Contato: <Contact/>,
@@ -45,14 +46,14 @@ export default function ScreenDashboardAdmin() {
   };
 
   return (
-    <Container className={styles.dashboardContainer} maxWidth="100%">
+    <Box>
       <Topbar/>
       <Box display="flex" className={styles.dashboardContent}>
         <SidebarAdmin onMenuClick={handleMenuClick} isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen}/>
-        <Box flexGrow={1} sx={{width: "100%"}}>
+        <Box sx={{width: "100%", height: '90vh'}}>
           {components[selectedComponent]? components[selectedComponent]: <Init/>}
         </Box>
       </Box>
-    </Container>
+    </Box>
   );
 }

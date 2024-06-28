@@ -1,6 +1,5 @@
-const API_URL = 'http://localhost:3000/api'; // Substitua pela URL correta do seu backend
+const API_URL = 'http://localhost:3001/api'; 
 
-// Função para fazer login
 export const loginUser = async (email, password) => {
   try {
     const response = await fetch(`${API_URL}/login`, {
@@ -12,14 +11,16 @@ export const loginUser = async (email, password) => {
     });
 
     if (!response.ok) {
-      throw new Error('Login failed');
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Login failed');
     }
 
     const data = await response.json();
+    localStorage.setItem('token', data.access_token);
+    localStorage.setItem('userId', data.user.sub);
     return data;
   } catch (error) {
     console.error('Error logging in:', error);
     throw error;
   }
-
 };

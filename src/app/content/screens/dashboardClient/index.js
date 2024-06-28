@@ -31,7 +31,7 @@ export default function ScreenDashboardClient() {
   };
 
   return (
-    <Container className={styles.dashboardContainer} maxWidth="100%">
+    <div>
       <Topbar/>
       <Box display="flex" className={styles.dashboardContent}>
         <SidebarClient onMenuClick={handleMenuClick} isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen}/>
@@ -39,6 +39,6 @@ export default function ScreenDashboardClient() {
           {components[selectedComponent]? components[selectedComponent]: <PlansClient/>}
         </Box>
       </Box>
-    </Container>
+    </div>
   );
 }

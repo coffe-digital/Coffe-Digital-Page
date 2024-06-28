@@ -1,42 +1,93 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Modal,
   Box,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Grid,
   Typography,
 } from "@mui/material";
+import { createProduct, updateProduct } from "./API";
+import toast from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
 
-const ProductModal = ({ open, onClose }) => {
-  const [product, setProduct] = useState({
+const ProductModal = ({ open, onClose, onSave, product }) => {
+  const [productData, setProductData] = useState({
     name: "",
-    brand: "",
     price: "",
-    barcode: "",
+    bar_code: "",
     description: "",
-    category: "",
     quantity: "",
-    images: [],
-    discount: "",
+    image: "",
   });
+
+  useEffect(() => {
+    if (product) {
+      setProductData(product);
+    } else {
+      setProductData({
+        name: "",
+        price: "",
+        bar_code: "",
+        description: "",
+        quantity: "",
+        image: "",
+      });
+    }
+  }, [product]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setProduct({
-      ...product,
+    setProductData({
+      ...productData,
       [name]: value,
     });
   };
 
-  const handleSubmit = () => {
-    // Lógica para enviar os dados do produto para a API ou fazer outra coisa com eles
-    console.log("Dados do produto:", product);
-    onClose();
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProductData({
+          ...productData,
+          image: reader.result,
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const formattedProductData = {
+        ...productData,
+        price: parseFloat(productData.price),
+        quantity: parseInt(productData.quantity),
+      };
+
+      if (product) {
+        const updatedProduct = await updateProduct(product.id, formattedProductData);
+        toast.success("Produto atualizado com sucesso");
+        setProductData({
+          name: "",
+          price: "",
+          bar_code: "",
+          description: "",
+          quantity: "",
+          image: "",
+        });
+        onSave(updatedProduct);
+      } else {
+        const createdProduct = await createProduct(formattedProductData);
+        toast.success("Produto criado com sucesso");
+        onSave(createdProduct);
+      }
+      onClose();
+    } catch (error) {
+      toast.error("Erro ao salvar o produto");
+      console.error("Erro ao salvar o produto:", error);
+    }
   };
 
   return (
@@ -54,8 +105,8 @@ const ProductModal = ({ open, onClose }) => {
           transform: "translate(-50%, -50%)",
         }}
       >
-         <Typography variant="h6" gutterBottom sx={{borderBottom: '2px solid black'}}>
-          Criar Novo Produto
+        <Typography variant="h6" gutterBottom sx={{ borderBottom: '2px solid black' }}>
+          {product ? "Editar Produto" : "Criar Novo Produto"}
         </Typography>
         <Grid container spacing={1}>
           <Grid item xs={6}>
@@ -64,18 +115,9 @@ const ProductModal = ({ open, onClose }) => {
               margin="normal"
               label="Nome do Produto"
               name="name"
-              value={product.name}
+              value={productData.name}
               onChange={handleChange}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              margin="normal"
-              label="Marca"
-              name="brand"
-              value={product.brand}
-              onChange={handleChange}
+              required
             />
           </Grid>
           <Grid item xs={6}>
@@ -84,8 +126,10 @@ const ProductModal = ({ open, onClose }) => {
               margin="normal"
               label="Preço"
               name="price"
-              value={product.price}
+              type="number"
+              value={productData.price}
               onChange={handleChange}
+              required
             />
           </Grid>
           <Grid item xs={6}>
@@ -93,9 +137,10 @@ const ProductModal = ({ open, onClose }) => {
               fullWidth
               margin="normal"
               label="Código de Barras"
-              name="barcode"
-              value={product.barcode}
+              name="bar_code"
+              value={productData.bar_code}
               onChange={handleChange}
+              required
             />
           </Grid>
           <Grid item xs={6}>
@@ -104,62 +149,67 @@ const ProductModal = ({ open, onClose }) => {
               margin="normal"
               label="Descrição"
               name="description"
-              value={product.description}
+              value={productData.description}
               onChange={handleChange}
+              required
             />
           </Grid>
-          <Grid item xs={6}>
-            <FormControl fullWidth margin="normal">
-              <InputLabel>Categoria</InputLabel>
-              <Select
-                name="category"
-                value={product.category}
-                onChange={handleChange}
-              >
-                <MenuItem value="categoria1">Categoria 1</MenuItem>
-                <MenuItem value="categoria2">Categoria 2</MenuItem>
-                {/* Adicione mais itens de menu conforme necessário */}
-              </Select>
-            </FormControl>
-          </Grid>
+
           <Grid item xs={6}>
             <TextField
               fullWidth
               margin="normal"
               label="Quantidade"
               name="quantity"
-              value={product.quantity}
+              type="number"
+              value={productData.quantity}
               onChange={handleChange}
+              required
             />
           </Grid>
           <Grid item xs={6}>
-            <TextField
+            {productData.image && (
+              <Box
+                sx={{
+                  mt: 2,
+                  mb: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center'
+                }}
+              >
+                <img
+                  src={productData.image}
+                  alt="Produto"
+                  style={{ maxWidth: '100%', maxHeight: 200 }}
+                />
+              </Box>
+            )}
+            <Button
+              variant="outlined"
+              component="label"
               fullWidth
-              margin="normal"
-              type="file"
-              label=""
-              name="images"
-              onChange={(e) => console.log(e.target.files)}
-              multiple
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              margin="normal"
-              label="Desconto"
-              name="discount"
-              value={product.discount}
-              onChange={handleChange}
-            />
+              sx={{ mt: 2 }}
+            >
+              {productData.image ? "Editar Imagem" : "Upload Imagem"}
+              <input
+                type="file"
+                name="image"
+                onChange={handleImageChange}
+                hidden
+              />
+            </Button>
           </Grid>
         </Grid>
-        <Button onClick={handleSubmit} variant="contained" color="success">
-          Cadastrar Produto
-        </Button>
-        <Button variant="contained" color="error" onClick={onClose} sx={{ ml: 2 }}>
+        <Box sx={{ mt: 2 }}>
+          <Button onClick={handleSubmit} variant="contained" color="success">
+            {product ? "Salvar Alterações" : "Cadastrar Produto"}
+          </Button>
+          <Button variant="contained" color="error" onClick={onClose} sx={{ ml: 2 }}>
             Cancelar
           </Button>
+        </Box>
+        <Toaster />
       </Box>
     </Modal>
   );

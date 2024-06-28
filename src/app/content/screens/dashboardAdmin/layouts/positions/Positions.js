@@ -1,8 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
-  List,
   Paper,
   Table,
   TableBody,
@@ -26,8 +25,9 @@ import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import ArticleIcon from "@mui/icons-material/Article";
 import AddIcon from "@mui/icons-material/Add";
-import PositionModal from "@/app/components/Modal/Admin/CreatePosition";
+import CreatePositionModal from "@/app/components/Modal/Admin/CreatePosition";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import { fetchRoles, deleteRole } from './API';
 
 function TablePaginationActions(props) {
   const theme = useTheme();
@@ -91,61 +91,29 @@ function TablePaginationActions(props) {
   );
 }
 
-export function CustomPaginationActionsTable() {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
-  // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-}
 export default function Positions() {
-  function createData(name, calories, fat) {
-    return { name, calories, fat };
-  }
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [isPositionModalOpen, setIsPositionModalOpen] = React.useState(false);
+  const [roles, setRoles] = useState([]);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [isPositionModalOpen, setIsPositionModalOpen] = useState(false);
+  const [roleToEdit, setRoleToEdit] = useState(null);
 
-  // Função para criar um objeto de dados de café
-  const createCoffeeData = (
-    id,
-    nome,
-    permissao
-  ) => {
-    return { id, nome, permissao };
+  useEffect(() => {
+    const getRoles = async () => {
+      const rolesFromApi = await fetchRoles();
+      setRoles(rolesFromApi);
+    };
+
+    getRoles();
+  }, []);
+
+  const refreshRoles = async () => {
+    const rolesFromApi = await fetchRoles();
+    setRoles(rolesFromApi);
   };
 
-  const rows = [
-    createCoffeeData(
-      1,
-      "Administrador",
-      "Total"
-    ),
-    createCoffeeData(
-      2,
-      "Cliente",
-      "Compras"
-    ),
-    createCoffeeData(
-      3,
-      "Funcionário",
-      "Edição de páginas"
-    ),
-    
-  ].sort((a, b) => (a.quantidade < b.quantidade ? -1 : 1));
-
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - roles.length) : 0;
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -157,23 +125,37 @@ export default function Positions() {
   };
 
   const handleOpenPositionModal = () => {
+    setRoleToEdit(null);
     setIsPositionModalOpen(true);
+  };
+
+  const handleOpenEditPositionModal = (role) => {
+    setRoleToEdit(role);
+    setIsPositionModalOpen(true);
+  };
+
+  const handleDeletePosition = async (id) => {
+    try {
+      await deleteRole(id);
+      setRoles(roles.filter(role => role.id !== id));
+    } catch (error) {
+      console.error('Erro ao excluir cargo:', error);
+    }
   };
 
   const handleClosePositionModal = () => {
     setIsPositionModalOpen(false);
   };
 
-
   return (
     <Box className={styles.positions}>
       <Typography
         typography="h4"
-        style={{fontWeight: "bold", color: "#1E3932"}}
+        style={{ fontWeight: "bold", color: "#1E3932" }}
       >
         Cargos
       </Typography>
-      <Typography typography="label" style={{padding: '0 0 1rem 0', color: "#1E3932", fontSize: '.875rem'}}>
+      <Typography typography="label" style={{ padding: '0 0 1rem 0', color: "#1E3932", fontSize: '.875rem' }}>
         Gerencie todos os seus cargos
       </Typography>
       <TableContainer component={Paper} className={styles.positions__table}>
@@ -221,29 +203,28 @@ export default function Positions() {
           </TableHead>
           <TableBody>
             {(rowsPerPage > 0
-              ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              : rows
-            ).map((row) => (
-              <TableRow key={row.name}>
+              ? roles.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              : roles
+            ).map((role) => (
+              <TableRow key={role.id}>
                 <TableCell component="th" scope="row">
-                  {row.id}
+                  {role.id}
                 </TableCell>
                 <TableCell component="th" scope="row">
-                  {row.nome}
+                  {role.name}
                 </TableCell>
-                <TableCell  align="left">
-                  {row.permissao}
+                <TableCell align="left">
+                  {role.permissions && role.permissions.map(p => p.name).join(', ')}
                 </TableCell>
-                <TableCell>
-                <Tooltip title="Editar cargo">
+                <TableCell style={{display: 'flex', gap: '1rem'}}>
+                  <Tooltip title="Editar cargo">
                     <span>
-                    <FaEdit style={{ cursor: "pointer" }} />{" "}
+                      <FaEdit style={{ cursor: "pointer" }} onClick={() => handleOpenEditPositionModal(role)} />
                     </span>
                   </Tooltip>
-                
                   <Tooltip title="Excluir cargo">
                     <span>
-                      <FaTrash style={{ cursor: "pointer" }} color="red" />
+                      <FaTrash style={{ cursor: "pointer" }} color="red" onClick={() => handleDeletePosition(role.id)} />
                     </span>
                   </Tooltip>
                 </TableCell>
@@ -260,7 +241,7 @@ export default function Positions() {
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25, { label: "Todos", value: -1 }]}
                 colSpan={4}
-                count={rows.length}
+                count={roles.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 slotProps={{
@@ -279,8 +260,12 @@ export default function Positions() {
           </TableFooter>
         </Table>
       </TableContainer>
-       {/* Modal para criar novo cargo */}
-       <PositionModal open={isPositionModalOpen} onClose={handleClosePositionModal} />
+      <CreatePositionModal
+        open={isPositionModalOpen}
+        onClose={handleClosePositionModal}
+        roleToEdit={roleToEdit}
+        refreshRoles={refreshRoles}
+      />
     </Box>
   );
 }

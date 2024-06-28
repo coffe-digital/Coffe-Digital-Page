@@ -1,9 +1,7 @@
-import React from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
-  List,
   Paper,
   Table,
   TableBody,
@@ -15,19 +13,21 @@ import {
   TableRow,
   TextField,
   Typography,
-  Tooltip
+  Tooltip,
+  IconButton
 } from "@mui/material";
-
+import { format } from 'date-fns';
+import { jsPDF } from "jspdf";
+import 'jspdf-autotable';
 import styles from "./Clients.module.css";
 import { useTheme } from "@mui/material/styles";
-import IconButton from "@mui/material/IconButton";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import ArticleIcon from '@mui/icons-material/Article';
-import AddIcon from '@mui/icons-material/Add';
 import { FaEdit, FaTrash } from "react-icons/fa";
+import { fetchUsers, updateClient, deleteClient } from './API';
 import ReportModal from "@/app/components/Modal/Admin/ReportModal";
 
 function TablePaginationActions(props) {
@@ -92,44 +92,21 @@ function TablePaginationActions(props) {
   );
 }
 
-export function CustomPaginationActionsTable() {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-}
 export default function Clients() {
-  function createData(id, name, cpf, phone, birthdate, adress, email, password ) {
-    return { id, name, cpf, phone, birthdate, adress, email, password };
-  }
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [isReportModalOpen, setIsReportModalOpen] = useState(false); 
-  const rows = [
-    createData(1, "Antônio Silva", "654.321.987-10", "+55 11 92345-6789", "1979-09-08", "Avenida Central, 456", "juliana.oliveira@example.com"),
-    createData(3, "Lucas Pereira", "321.654.987-10", "+55 11 93456-7890", "1993-12-20", "Rua dos Pássaros, 789", "lucas.pereira@example.com"),
-    createData(4, "Patrícia Santos", "789.123.456-10", "+55 11 94567-8901", "1986-06-30", "Avenida das Árvores, 321", "patricia.santos@example.com"),
-    createData(5, "Gabriel Souza", "147.258.369-10", "+55 11 95678-9012", "1990-11-18", "Rua dos Coqueiros, 987", "gabriel.souza@example.com"),
-    createData(6, "Ana Paula Lima", "258.369.147-10", "+55 11 96789-0123", "1982-04-12", "Avenida dos Girassóis, 654", "anapaula.lima@example.com"),
-    createData(7, "Paulo Martins", "369.147.258-10", "+55 11 97890-1234", "1997-07-05", "Rua das Pedras, 147", "paulo.martins@example.com"),
-    createData(8, "Isabela Costa", "147.258.369-10", "+55 11 98901-2345", "1980-10-28", "Avenida dos Pinheiros, 258", "isabela.costa@example.com"),
-    createData(9, "Marcos Lima", "369.147.258-10", "+55 11 98901-2345", "1996-01-05", "Rua das Rosas, 369", "marcos.lima@example.com", "marcos123"),
-    createData(10, "Renata Oliveira", "369.147.258-10", "+55 11 98901-2345", "1983-04-28", "Avenida dos Lírios, 147", "renata.oliveira@example.com")
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [clients, setClients] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
-  ].sort((a, b) => (a.id < b.id ? -1 : 1));
+  useEffect(() => {
+    const getClients = async () => {
+      const usersFromApi = await fetchUsers();
+      setClients(usersFromApi);
+    };
 
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+    getClients();
+  }, []);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -147,14 +124,48 @@ export default function Clients() {
   const handleCloseReportModal = () => {
     setIsReportModalOpen(false);
   };
- 
+
+  const handleEditClient = (client) => {
+    // Implementar a lógica para editar o cliente
+  };
+
+  const handleDeleteClient = async (id) => {
+    if (await deleteClient(id)) {
+      setClients(clients.filter(client => client.id !== id));
+    }
+  };
+
+  const handleGenerateReport = () => {
+    const doc = new jsPDF();
+    doc.text("Relatório de Clientes", 20, 10);
+    doc.autoTable({
+      head: [['ID', 'Nome', 'RG', 'Telefone', 'Data de Nascimento', 'Endereço', 'Email']],
+      body: clients.map(client => [
+        client.id,
+        client.name,
+        client.rg,
+        client.phone,
+        format(new Date(client.birth_date), 'dd/MM/yyyy'),
+        client.address,
+        client.email
+      ]),
+    });
+    doc.save('relatorio_clientes.pdf');
+  };
+
+  const filteredClients = clients.filter(client =>
+    client.name? client.name.toLowerCase().includes(searchTerm.toLowerCase()) : ''
+  );
+
+  const emptyRows =
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - filteredClients.length) : 0;
 
   return (
     <Box className={styles.clients}>
-      <Typography typography="h4" style={{fontWeight: "bold", color: "#1E3932"}}>
+      <Typography typography="h4" style={{ fontWeight: "bold", color: "#1E3932" }}>
         Clientes
       </Typography>
-      <Typography typography="label" style={{padding: '0 0 1rem 0', color: "#1E3932", fontSize: '.875rem'}}>
+      <Typography typography="label" style={{ padding: '0 0 1rem 0', color: "#1E3932", fontSize: '.875rem' }}>
         Gerencie todos as informações dos seus clientes
       </Typography>
       <TableContainer component={Paper} className={styles.clients__table}>
@@ -166,6 +177,8 @@ export default function Clients() {
               label="Pesquise clientes"
               variant="outlined"
               className={styles.clients__table__input}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
             <Button
               style={{ background: "#D9D9D9", color: "#000" }}
@@ -180,7 +193,7 @@ export default function Clients() {
               variant="contained"
               style={{ background: "#4E392A" }}
               className={styles.clients__search__input}
-              onClick={handleOpenReportModal}
+              onClick={handleGenerateReport}
             >
               <ArticleIcon />
               Gerar Relatório
@@ -193,7 +206,7 @@ export default function Clients() {
               <TableCell sx={{ fontWeight: "bold" }}>ID</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Nome</TableCell>
               <TableCell align="left" sx={{ fontWeight: "bold" }}>
-                CPF
+                RG
               </TableCell>
               <TableCell align="left" sx={{ fontWeight: "bold" }}>
                 Telefone
@@ -214,46 +227,43 @@ export default function Clients() {
           </TableHead>
           <TableBody>
             {(rowsPerPage > 0
-              ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              : rows
-            ).map((row) => (
-              <TableRow key={row.name}>
+              ? filteredClients.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              : filteredClients
+            ).map((client) => (
+              <TableRow key={client.id}>
                 <TableCell component="th" scope="row">
-                  {row.id}
+                  {client.id}
                 </TableCell>
                 <TableCell component="th" scope="row">
-                  {row.name}
+                  {client.name}
                 </TableCell>
                 <TableCell style={{ width: 160 }} align="left">
-                  {row.cpf}
+                  {client.rg}
                 </TableCell>
                 <TableCell style={{ width: 160 }} align="left">
-                  {row.phone}
-                </TableCell>
-                <TableCell style={{ width: 160 }} align="left">
-                  {row.birthdate}
-                </TableCell>
-                <TableCell style={{ width: 160 }} align="left">
-                  {row.adress}
-                </TableCell>
-                <TableCell style={{ width: 160 }} align="left">
-                  {row.email}
+                  {client.phone}
                 </TableCell>
                 <TableCell>
-                <Tooltip title="Editar cliente">
+                  {format(new Date(client.birth_date), 'dd/MM/yyyy')}
+                </TableCell>
+                <TableCell style={{ width: 160 }} align="left">
+                  {client.address}
+                </TableCell>
+                <TableCell style={{ width: 160 }} align="left">
+                  {client.email}
+                </TableCell>
+                <TableCell>
+                  <Tooltip title="Editar cliente">
                     <span>
-                    <FaEdit style={{ cursor: "pointer" }} />{" "}
+                      <FaEdit style={{ cursor: "pointer" }} onClick={() => handleEditClient(client)} />{" "}
                     </span>
                   </Tooltip>
-                
                   <Tooltip title="Excluir cliente">
                     <span>
-                      <FaTrash style={{ cursor: "pointer" }} color="red" />
+                      <FaTrash style={{ cursor: "pointer" }} color="red" onClick={() => handleDeleteClient(client.id)} />
                     </span>
                   </Tooltip>
                 </TableCell>
-       
-                
               </TableRow>
             ))}
             {emptyRows > 0 && (
@@ -267,7 +277,7 @@ export default function Clients() {
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25, { label: "Todos", value: -1 }]}
                 colSpan={8}
-                count={rows.length}
+                count={filteredClients.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 slotProps={{
@@ -286,7 +296,7 @@ export default function Clients() {
           </TableFooter>
         </Table>
       </TableContainer>
-      
+
       {/* Modal para gerar relatório */}
       <ReportModal open={isReportModalOpen} onClose={handleCloseReportModal} />
     </Box>

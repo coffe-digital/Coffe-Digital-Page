@@ -1,13 +1,9 @@
-import {
-  Container,
-  Grid,
-  Card,
-  CardMedia,
-  CardContent,
-  Typography,
-  Box,
-  Button,
-} from "@mui/material";
+import React from "react";
+import { Container, Typography, Box, IconButton } from "@mui/material";
+import InstagramIcon from '@mui/icons-material/Instagram';
+import TwitterIcon from '@mui/icons-material/Twitter';
+import FacebookIcon from '@mui/icons-material/Facebook';
+
 export default function Footer() {
   return (
     <Box
@@ -32,8 +28,15 @@ export default function Footer() {
             marginTop: "10px",
           }}
         >
-          <Typography variant="body2">Instagram</Typography>
-          <Typography variant="body2">Twitter</Typography>
+          <IconButton href="https://www.instagram.com" target="_blank" sx={{ color: "white" }}>
+            <InstagramIcon />
+          </IconButton>
+          <IconButton href="https://www.facebook.com" target="_blank" sx={{ color: "white" }}>
+            <FacebookIcon />
+          </IconButton>
+          <IconButton href="https://www.twitter.com" target="_blank" sx={{ color: "white" }}>
+            <TwitterIcon />
+          </IconButton>
         </Box>
       </Container>
     </Box>

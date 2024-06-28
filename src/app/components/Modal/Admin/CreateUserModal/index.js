@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   Box,
@@ -10,28 +10,57 @@ import {
   Select,
   MenuItem
 } from "@mui/material";
-import { UserAPI } from "./API";
+import { createUser, updateUser, fetchRoles } from './API';
 
-const CreateUserModal = ({ open, onClose }) => {
+const CreateUserModal = ({ open, onClose, userToEdit, refreshUsers }) => {
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [userPassword, setUserPassword] = useState("");
-  const [position, setPosition] = useState("");
+  const [roleId, setRoleId] = useState("");
+  const [roles, setRoles] = useState([]);
 
-  const handleCreateUser = () => {
-    UserAPI.createUser({
-      email: userEmail,
-      password: userPassword,
-      name: userName
-    })
-    .then(data => {
-      console.log('Usuário criado com sucesso:', data);
-    })
-    .catch(error => {
-      console.error('Erro ao criar usuário:', error.message);
-    });
-    console.log("Novo usuário criado:", { planName, planDescription, planValue, planStatus });
-    onClose();
+  useEffect(() => {
+    const fetchRolesData = async () => {
+      try {
+        const rolesData = await fetchRoles();
+        console.log(rolesData)
+        setRoles(rolesData);
+      } catch (error) {
+        console.error(error.message);
+      }
+    };
+
+    fetchRolesData();
+
+    if (userToEdit) {
+      setUserName(userToEdit.name);
+      setUserEmail(userToEdit.email);
+      setRoleId(userToEdit.roleId);
+    }
+  }, [userToEdit]);
+
+  const handleCreateUser = async () => {
+    try {
+      if (userToEdit) {
+        await updateUser(userToEdit.id, {
+          name: userName,
+          email: userEmail,
+          password: userPassword,
+          roleId: roleId
+        });
+      } else {
+        await createUser({
+          name: userName,
+          email: userEmail,
+          password: userPassword,
+          roleId: roleId
+        });
+      }
+      refreshUsers();
+      onClose();
+    } catch (error) {
+      console.error(error.message);
+    }
   };
 
   return (
@@ -50,7 +79,7 @@ const CreateUserModal = ({ open, onClose }) => {
         }}
       >
         <Typography variant="h6" gutterBottom sx={{borderBottom: '2px solid black'}}>
-          Criar Novo Usuário
+          {userToEdit ? "Editar Usuário" : "Criar Novo Usuário"}
         </Typography>
         <TextField
           label="Nome do usuário"
@@ -59,21 +88,22 @@ const CreateUserModal = ({ open, onClose }) => {
           value={userName}
           onChange={(e) => setUserName(e.target.value)}
         />
-         <FormControl fullWidth margin="normal">
+        <FormControl fullWidth margin="normal">
           <InputLabel>Cargo</InputLabel>
           <Select
-            value={position}
-            onChange={(e) => setPosition(e.target.value)}
+            value={roleId}
+            onChange={(e) => setRoleId(e.target.value)}
           >
-            <MenuItem value="Administrador">Administrador</MenuItem>
-            <MenuItem value="Funcionário">Funcionário</MenuItem>
+            {roles.map((role) => (
+              <MenuItem key={role.id} value={role.id}>{role.name}</MenuItem>
+            ))}
           </Select>
         </FormControl>
         <TextField
           label="E-mail"
           fullWidth
           margin="normal"
-          value={userName}
+          value={userEmail}
           onChange={(e) => setUserEmail(e.target.value)}
         />
         <TextField
@@ -87,7 +117,7 @@ const CreateUserModal = ({ open, onClose }) => {
     
         <Box sx={{ mt: 2 }}>
           <Button variant="contained" color="success" onClick={handleCreateUser}>
-            Criar usuário
+            {userToEdit ? "Salvar Alterações" : "Criar usuário"}
           </Button>
           <Button variant="contained" color="error" onClick={onClose} sx={{ ml: 2 }}>
             Cancelar

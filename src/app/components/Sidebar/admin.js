@@ -10,16 +10,17 @@ import {
   ListItemText
 } from "@mui/material";
 
-//STYLES
+
 import styles from "./Sidebar.module.css";
 
-//ICONS
+
 import { AiOutlineUser } from "react-icons/ai";
 import { BiSolidCoffeeBean } from "react-icons/bi";
 import { FaUsers } from "react-icons/fa";
 import { BsPersonVcardFill } from "react-icons/bs";
 import { BsBoxSeam } from "react-icons/bs";
 import { PiUsersFour } from "react-icons/pi";
+import { GoPasskeyFill } from "react-icons/go";
 import { RiPagesLine } from "react-icons/ri";
 import { GrMenu } from "react-icons/gr";
 import ExpandLess from "@mui/icons-material/ExpandLess";
@@ -39,7 +40,7 @@ const SidebarAdmin = ({ onMenuClick, isMenuOpen, setIsMenuOpen }) => {
   };
 
   const updateURL = (menuOption) => {
-    window.location.hash = menuOption.toLowerCase(); // Atualiza a URL com a opção do menu
+    window.location.hash = menuOption.toLowerCase(); 
   };
 
   function verifyUserPosition() {
@@ -58,7 +59,6 @@ const SidebarAdmin = ({ onMenuClick, isMenuOpen, setIsMenuOpen }) => {
 
   return isMenuOpen ? (
     <Box
-      bgcolor="primary.main"
       color="primary.contrastText"
       className={`${styles.sidebar} ${
         isMenuOpen ? styles.sidebarOpen : styles.sidebarClosed
@@ -117,15 +117,6 @@ const SidebarAdmin = ({ onMenuClick, isMenuOpen, setIsMenuOpen }) => {
             >
               <ListItemText primary="Todos os Produtos" className={styles.icon__text} />
             </ListItemButton>
-            <ListItemButton
-              sx={{ pl: 4 }}
-              onClick={() => {
-                onMenuClick("Categorias");
-                updateURL("Categorias");
-              }}
-            >
-              <ListItemText primary="Categorias" className={styles.icon__text} />
-            </ListItemButton>
           </List>
         </Collapse>
 
@@ -149,6 +140,16 @@ const SidebarAdmin = ({ onMenuClick, isMenuOpen, setIsMenuOpen }) => {
         >
           <BsPersonVcardFill className={styles.icon} />
           <ListItemText primary="Cargos" className={styles.icon__text} />
+        </ListItem>
+        <ListItem
+          button
+          onClick={() => {
+            onMenuClick("Permissões");
+            updateURL("Permissões");
+          }}
+        >
+          <GoPasskeyFill className={styles.icon} />
+          <ListItemText primary="Permissões" className={styles.icon__text} />
         </ListItem>
         <ListItemButton onClick={handleClick}>
           <RiPagesLine className={styles.icon} />
@@ -192,7 +193,6 @@ const SidebarAdmin = ({ onMenuClick, isMenuOpen, setIsMenuOpen }) => {
     </Box>
   ) : (
     <Box
-      bgcolor="primary.main"
       color="primary.contrastText"
       className={`${styles.sidebar_compressed}`}
     >
@@ -255,6 +255,15 @@ const SidebarAdmin = ({ onMenuClick, isMenuOpen, setIsMenuOpen }) => {
           }}
         >
           <BsPersonVcardFill className={styles.icon} />
+        </ListItem>
+        <ListItem
+          button
+          onClick={() => {
+            onMenuClick("Permissões");
+            updateURL("Permissões");
+          }}
+        >
+          <GoPasskeyFill className={styles.icon} />
         </ListItem>
       </List>
     </Box>

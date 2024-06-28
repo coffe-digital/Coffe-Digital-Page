@@ -1,9 +1,7 @@
-import React from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
-  List,
   Paper,
   Table,
   TableBody,
@@ -15,9 +13,8 @@ import {
   TableRow,
   TextField,
   Typography,
-  Tooltip
+  Tooltip,
 } from "@mui/material";
-
 import styles from "./Plans.module.css";
 import { useTheme } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
@@ -27,9 +24,14 @@ import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import ArticleIcon from "@mui/icons-material/Article";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import toast from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
 import AddIcon from "@mui/icons-material/Add";
 import PlanModal from "@/app/components/Modal/Admin/PlanModal";
 import ReportModal from "@/app/components/Modal/Admin/ReportModal";
+import { fetchPlans, softDeletePlan } from "./API";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 function TablePaginationActions(props) {
   const theme = useTheme();
@@ -93,38 +95,25 @@ function TablePaginationActions(props) {
   );
 }
 
-export function CustomPaginationActionsTable() {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-}
 export default function Plans() {
-  function createData(name, description, value, status) {
-    return { name, description, value, status };
-  }
-  const [page, setPage] = React.useState(0);
+  const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [plans, setPlans] = useState([]);
+  const [filteredPlans, setFilteredPlans] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-  const rows = [
-    createData("Plano Iniciante", "Descrição", "Ativo", 29.9),
-    createData("Plano Premium", "Descrição", "Ativo", 49.9),
-    createData("Plano Café do Mês", "Descrição", "Ativo", 119.9),
-  ].sort((a, b) => (a.calories < b.calories ? -1 : 1));
+  const [currentPlan, setCurrentPlan] = useState(null);
 
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+  useEffect(() => {
+    const getPlans = async () => {
+      const plansFromApi = await fetchPlans();
+      setPlans(plansFromApi);
+      setFilteredPlans(plansFromApi);
+    };
+
+    getPlans();
+  }, []);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -135,12 +124,14 @@ export default function Plans() {
     setPage(0);
   };
 
-  const handleOpenPlanModal = () => {
+  const handleOpenPlanModal = (plan = null) => {
+    setCurrentPlan(plan);
     setIsPlanModalOpen(true);
   };
 
   const handleClosePlanModal = () => {
     setIsPlanModalOpen(false);
+    setCurrentPlan(null);
   };
 
   const handleOpenReportModal = () => {
@@ -151,8 +142,65 @@ export default function Plans() {
     setIsReportModalOpen(false);
   };
 
+  const handleSavePlan = (savedPlan) => {
+    if (currentPlan) {
+      setPlans((prevPlans) =>
+        prevPlans.map((plan) => (plan.id === savedPlan.id ? savedPlan : plan))
+      );
+    } else {
+      setPlans((prevPlans) => [...prevPlans, savedPlan]);
+    }
+    setFilteredPlans(plans); 
+  };
+
+  const handleSoftDeletePlan = async (id) => {
+    const deleted = await softDeletePlan(id);
+    if (deleted) {
+      setPlans((prevPlans) => prevPlans.filter((plan) => plan.id !== id));
+      setFilteredPlans((prevPlans) => prevPlans.filter((plan) => plan.id !== id));
+      toast.success('Plano excluído com sucesso')
+    }
+  };
+
+  const handleSearch = (event) => {
+    const value = event.target.value;
+    setSearchTerm(value);
+    const filtered = plans.filter((plan) =>
+      plan.name.toLowerCase().includes(value.toLowerCase()) ||
+      plan.description.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredPlans(filtered);
+  };
+
+  const generatePdf = () => {
+    const doc = new jsPDF();
+    doc.text("Relatório de Planos", 10, 10);
+    const tableColumn = ["Nome", "Descrição", "Status", "Valor"];
+    const tableRows = [];
+
+    filteredPlans.forEach(plan => {
+      const planData = [
+        plan.name,
+        plan.description,
+        plan.status ? "Ativo" : "Inativo",
+        plan.price.toLocaleString("pt-br", {
+          style: "currency",
+          currency: "BRL",
+        })
+      ];
+      tableRows.push(planData);
+    });
+
+    doc.autoTable(tableColumn, tableRows, { startY: 20 });
+    doc.save("relatorio_planos.pdf");
+  };
+
+  const emptyRows =
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - filteredPlans.length) : 0;
+
   return (
     <Box className={styles.plans}>
+      <Toaster />
       <Typography
         typography="h4"
         style={{ fontWeight: "bold", color: "#1E3932" }}
@@ -175,6 +223,8 @@ export default function Plans() {
               label="Pesquise os planos"
               variant="outlined"
               className={styles.plans__table__input}
+              value={searchTerm}
+              onChange={handleSearch}
             />
             <Button
               style={{ background: "#D9D9D9", color: "#000" }}
@@ -189,7 +239,7 @@ export default function Plans() {
               variant="contained"
               style={{ background: "#4E392A" }}
               className={styles.plans__search__input}
-              onClick={handleOpenReportModal}
+              onClick={generatePdf}
             >
               <ArticleIcon />
               Gerar Relatório
@@ -198,7 +248,7 @@ export default function Plans() {
               variant="contained"
               style={{ background: "#1E3932" }}
               className={styles.plans__search__input}
-              onClick={handleOpenPlanModal}
+              onClick={() => handleOpenPlanModal()}
             >
               <AddIcon />
               Novo Plano
@@ -217,31 +267,37 @@ export default function Plans() {
           </TableHead>
           <TableBody>
             {(rowsPerPage > 0
-              ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              : rows
-            ).map((row) => (
-              <TableRow key={row.name}>
+              ? filteredPlans.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              : filteredPlans
+            ).map((plan) => (
+              <TableRow key={plan.id}>
                 <TableCell component="th" scope="row">
-                  {row.name}
+                  {plan.name}
                 </TableCell>
-                <TableCell>{row.description}</TableCell>
+                <TableCell>{plan.description}</TableCell>
+                <TableCell>{plan.status ? "Ativo" : "Inativo"}</TableCell>
                 <TableCell>
-                  {row.value.toLocaleString("pt-br", {
+                  R$ {plan.price.toLocaleString("pt-br", {
                     style: "currency",
                     currency: "BRL",
                   })}
                 </TableCell>
-                <TableCell>{row.status}</TableCell>
-                <TableCell>
-                <Tooltip title="Editar plano">
+                <TableCell style={{display: 'flex', gap: '1rem'}}>
+                  <Tooltip title="Editar plano">
                     <span>
-                    <FaEdit style={{ cursor: "pointer" }} />{" "}
+                      <FaEdit
+                        style={{ cursor: "pointer" }}
+                        onClick={() => handleOpenPlanModal(plan)}
+                      />
                     </span>
                   </Tooltip>
-                
                   <Tooltip title="Cancelar plano">
                     <span>
-                      <FaTrash style={{ cursor: "pointer" }} color="red" />
+                      <FaTrash
+                        style={{ cursor: "pointer" }}
+                        color="red"
+                        onClick={() => handleSoftDeletePlan(plan.id)}
+                      />
                     </span>
                   </Tooltip>
                 </TableCell>
@@ -258,7 +314,7 @@ export default function Plans() {
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25, { label: "Todos", value: -1 }]}
                 colSpan={5}
-                count={rows.length}
+                count={filteredPlans.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 slotProps={{
@@ -277,8 +333,13 @@ export default function Plans() {
           </TableFooter>
         </Table>
       </TableContainer>
-      {/* Modal para criar novo plano */}
-      <PlanModal open={isPlanModalOpen} onClose={handleClosePlanModal} />
+      {/* Modal para criar ou editar plano */}
+      <PlanModal
+        open={isPlanModalOpen}
+        onClose={handleClosePlanModal}
+        onSave={handleSavePlan}
+        plan={currentPlan}
+      />
 
       {/* Modal para gerar relatório */}
       <ReportModal open={isReportModalOpen} onClose={handleCloseReportModal} />

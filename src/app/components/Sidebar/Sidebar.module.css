@@ -3,7 +3,6 @@
     width: 350px;
     background-color: #455459;
     padding: 1rem 1rem;
-    margin: 0;
     overflow-y: scroll;
     z-index: 100;
     transition: width 0.3s ease;
@@ -13,6 +12,7 @@
     width: 35px;
     height: 50px;
     margin-left: 1rem;
+    margin-top: 4rem;
 }
 
 .menu__list{
@@ -51,6 +51,7 @@
   
 .sidebarClosed {
     width: 64px; 
+    
 }
 
 .sidebar_compressed{
@@ -58,6 +59,7 @@
     height: 100vh;
     background-color: #455459;
     box-shadow: 1px 2px 2px 1px #b8b8b8;
+    margin-top: 4rem;
 }
 
 .menu__hamburguer__compressed{

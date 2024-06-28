@@ -1,9 +1,7 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
-  List,
   Paper,
   Table,
   TableBody,
@@ -17,7 +15,6 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-
 import styles from "./Products.module.css";
 import { useTheme } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
@@ -30,6 +27,10 @@ import AddIcon from "@mui/icons-material/Add";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import ProductModal from "@/app/components/Modal/Admin/CreateProductsModal";
 import ReportModal from "@/app/components/Modal/Admin/ReportModal";
+import { fetchProducts, deleteProduct } from "./API";
+import { toast, ToastContainer } from "react-toastify";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 function TablePaginationActions(props) {
   const theme = useTheme();
@@ -93,112 +94,23 @@ function TablePaginationActions(props) {
   );
 }
 
-export function CustomPaginationActionsTable() {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
-  // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-}
 export default function Products() {
-  function createData(name, calories, fat) {
-    return { name, calories, fat };
-  }
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [products, setProducts] = useState([]);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-  // Função para criar um objeto de dados de café
-  const createCoffeeData = (
-    id,
-    nome,
-    categoria,
-    marca,
-    descricao,
-    quantidade,
-    valor
-  ) => {
-    return { id, nome, categoria, marca, descricao, quantidade, valor };
-  };
+  const [currentProduct, setCurrentProduct] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const rows = [
-    createCoffeeData(
-      1,
-      "Café 150g - Avelã",
-      "Café",
-      "Marca A",
-      "Descrição do café de Avelã",
-      150,
-      3.7
-    ),
-    createCoffeeData(
-      2,
-      "Café 150g - Baunilha",
-      "Café",
-      "Marca B",
-      "Descrição do café de Baunilha",
-      150,
-      25.0
-    ),
-    createCoffeeData(
-      3,
-      "Café 150g - Caramelo",
-      "Café",
-      "Marca C",
-      "Descrição do café de Caramelo",
-      150,
-      16.0
-    ),
-    createCoffeeData(
-      4,
-      "Café 150g - Tradicional",
-      "Café",
-      "Marca D",
-      "Descrição do café Tradicional",
-      150,
-      6.0
-    ),
-    createCoffeeData(
-      5,
-      "Capuccino - Caseiro",
-      "Capuccino",
-      "Marca E",
-      "Descrição do Capuccino Caseiro",
-      250,
-      16.0
-    ),
-    createCoffeeData(
-      6,
-      "Capuccino - Expresso",
-      "Capuccino",
-      "Marca F",
-      "Descrição do Capuccino Expresso",
-      250,
-      3.2
-    ),
-    createCoffeeData(
-      7,
-      "Café 200g - Tradicional",
-      "Café",
-      "Marca G",
-      "Descrição do café Tradicional",
-      200,
-      9.0
-    ),
-  ].sort((a, b) => (a.quantidade < b.quantidade ? -1 : 1));
+  useEffect(() => {
+    const getProducts = async () => {
+      const productsFromApi = await fetchProducts();
+      setProducts(productsFromApi);
+    };
 
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+    getProducts();
+  }, []);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -209,13 +121,14 @@ export default function Products() {
     setPage(0);
   };
 
-  const handleOpenCreateProductModal = () => {
-    console.log(isProductModalOpen);
+  const handleOpenProductModal = (product = null) => {
+    setCurrentProduct(product);
     setIsProductModalOpen(true);
   };
 
   const handleCloseProductModal = () => {
     setIsProductModalOpen(false);
+    setCurrentProduct(null);
   };
 
   const handleOpenReportModal = () => {
@@ -224,6 +137,75 @@ export default function Products() {
 
   const handleCloseReportModal = () => {
     setIsReportModalOpen(false);
+  };
+
+  const handleSaveProduct = (savedProduct) => {
+    if (currentProduct) {
+      setProducts((prevProducts) =>
+        prevProducts.map((product) =>
+          product.id === savedProduct.id ? savedProduct : product
+        )
+      );
+    } else {
+      setProducts((prevProducts) => [...prevProducts, savedProduct]);
+    }
+  };
+
+  const handleDeleteProduct = async (id) => {
+    try {
+      await deleteProduct(id);
+      setProducts((prevProducts) =>
+        prevProducts.filter((product) => product.id !== id)
+      );
+      toast.success("Produto excluído com sucesso");
+    } catch (error) {
+      toast.error("Erro ao excluir o produto");
+    }
+  };
+
+  const generateReport = () => {
+    const doc = new jsPDF();
+    const tableColumn = ["ID", "Nome", "Descrição", "Quantidade", "Valor"];
+    const tableRows = [];
+
+    products.forEach((product) => {
+      const productData = [
+        product.id,
+        product.name,
+        product.description,
+        product.quantity,
+        `R$ ${product.price.toLocaleString("pt-br", {
+          style: "currency",
+          currency: "BRL",
+        })}`,
+      ];
+      tableRows.push(productData);
+    });
+
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+    });
+
+    doc.save("relatorio_produtos.pdf");
+  };
+
+  const emptyRows =
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - products.length) : 0;
+
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const truncateDescription = (description) => {
+    const words = description.split(" ");
+    return words.length > 5
+      ? words.slice(0, 5).join(" ") + "..."
+      : description;
   };
 
   return (
@@ -250,6 +232,8 @@ export default function Products() {
               label="Pesquise os produtos"
               variant="outlined"
               className={styles.product__table__input}
+              value={searchTerm}
+              onChange={handleSearch}
             />
             <Button
               style={{ background: "#D9D9D9", color: "#000" }}
@@ -264,7 +248,7 @@ export default function Products() {
               variant="contained"
               style={{ background: "#4E392A" }}
               className={styles.product__search__input}
-              onClick={handleOpenReportModal}
+              onClick={generateReport}
             >
               <ArticleIcon />
               Gerar Relatório
@@ -273,7 +257,7 @@ export default function Products() {
               variant="contained"
               style={{ background: "#1E3932" }}
               className={styles.product__search__input}
-              onClick={handleOpenCreateProductModal}
+              onClick={() => handleOpenProductModal()}
             >
               <AddIcon />
               Novo Produto
@@ -283,68 +267,66 @@ export default function Products() {
         <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>ID</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Nome</TableCell>
-              <TableCell align="left" sx={{ fontWeight: "bold" }}>
-                Categoria
+              <TableCell align="left" sx={{ fontWeight: "bold", width: 60 }}>
+                Imagem
               </TableCell>
-              <TableCell align="left" sx={{ fontWeight: "bold" }}>
-                Marca
-              </TableCell>
-              <TableCell align="left" sx={{ fontWeight: "bold" }}>
+              <TableCell sx={{ fontWeight: "bold", width: 60 }}>ID</TableCell>
+              <TableCell sx={{ fontWeight: "bold", width: 120 }}>Nome</TableCell>
+              <TableCell align="left" sx={{ fontWeight: "bold", width: 200 }}>
                 Descrição
               </TableCell>
-              <TableCell align="left" sx={{ fontWeight: "bold" }}>
+              <TableCell align="left" sx={{ fontWeight: "bold", width: 100 }}>
                 Quantidade
               </TableCell>
-              <TableCell align="left" sx={{ fontWeight: "bold" }}>
+              <TableCell align="left" sx={{ fontWeight: "bold", width: 100 }}>
                 Valor
               </TableCell>
-              <TableCell align="left" sx={{ fontWeight: "bold" }}>
+              <TableCell align="left" sx={{ fontWeight: "bold", width: 100 }}>
                 Ação
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {(rowsPerPage > 0
-              ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              : rows
-            ).map((row) => (
-              <TableRow key={row.name}>
-                <TableCell component="th" scope="row">
-                  {row.id}
+              ? filteredProducts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              : filteredProducts
+            ).map((product) => (
+              <TableRow key={product.id}>
+                <TableCell style={{ width: 60 }}>
+                  <img src={product.image} alt={product.name} style={{ width: '50px', height: '50px' }} />
                 </TableCell>
-                <TableCell component="th" scope="row">
-                  {row.nome}
+                <TableCell style={{ width: 60 }}>
+                  {product.id}
                 </TableCell>
-                <TableCell style={{ width: 160 }} align="left">
-                  {row.categoria}
-                </TableCell>
-                <TableCell style={{ width: 160 }} align="left">
-                  {row.marca}
-                </TableCell>
-                <TableCell style={{ width: 160 }} align="left">
-                  {row.descricao}
-                </TableCell>
-                <TableCell style={{ width: 160 }} align="left">
-                  {row.quantidade}
-                </TableCell>
-                <TableCell style={{ width: 160 }} align="left">
-                  {row.valor.toLocaleString("pt-br", {
+                <TableCell style={{ width: 120 }}>{product.name}</TableCell>
+                <Tooltip title={product.description}>
+                  <TableCell style={{ width: 200, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {truncateDescription(product.description)}
+                  </TableCell>
+                </Tooltip>
+                <TableCell style={{ width: 100 }}>{product.quantity} Un.</TableCell>
+                <TableCell style={{ width: 100 }}>
+                  R$ {product.price.toLocaleString("pt-br", {
                     style: "currency",
                     currency: "BRL",
                   })}
                 </TableCell>
-                <TableCell>
+                <TableCell style={{ display: 'flex', gap: '1rem', width: 100 }}>
                   <Tooltip title="Editar produto">
                     <span>
-                      <FaEdit style={{ cursor: "pointer" }} />{" "}
+                      <FaEdit
+                        style={{ cursor: "pointer" }}
+                        onClick={() => handleOpenProductModal(product)}
+                      />
                     </span>
                   </Tooltip>
-
                   <Tooltip title="Excluir produto">
                     <span>
-                      <FaTrash style={{ cursor: "pointer" }} color="red" />
+                      <FaTrash
+                        style={{ cursor: "pointer" }}
+                        color="red"
+                        onClick={() => handleDeleteProduct(product.id)}
+                      />
                     </span>
                   </Tooltip>
                 </TableCell>
@@ -352,7 +334,7 @@ export default function Products() {
             ))}
             {emptyRows > 0 && (
               <TableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={6} />
+                <TableCell colSpan={10} />
               </TableRow>
             )}
           </TableBody>
@@ -361,7 +343,7 @@ export default function Products() {
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25, { label: "Todos", value: -1 }]}
                 colSpan={8}
-                count={rows.length}
+                count={filteredProducts.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 slotProps={{
@@ -380,14 +362,17 @@ export default function Products() {
           </TableFooter>
         </Table>
       </TableContainer>
-      {/* Modal para criar produto */}
+      {/* Modal para criar ou editar produto */}
       <ProductModal
         open={isProductModalOpen}
         onClose={handleCloseProductModal}
+        onSave={handleSaveProduct}
+        product={currentProduct}
       />
 
       {/* Modal para gerar relatório */}
       <ReportModal open={isReportModalOpen} onClose={handleCloseReportModal} />
+      <ToastContainer />
     </Box>
   );
 }

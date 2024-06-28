@@ -1,7 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
-  List,
   Paper,
   Table,
   TableBody,
@@ -14,15 +13,16 @@ import {
   Typography,
 } from "@mui/material";
 import styles from "./Init.module.css";
+import { SiCoffeescript } from "react-icons/si";
 import { useTheme } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import { FaUsersLine } from "react-icons/fa6";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
-import CoffeInital from "../../../../../../../public/icons/dashboardImages/coffe-initial.png";
-import Image from "next/image";
-import { GiCoffeeBeans } from "react-icons/gi";
+import { TfiUser, TfiWrite } from "react-icons/tfi";
+import { fetchProducts, fetchUsers, fetchOrders } from './API'; 
 
 function TablePaginationActions(props) {
   const theme = useTheme();
@@ -86,105 +86,33 @@ function TablePaginationActions(props) {
   );
 }
 
-export function CustomPaginationActionsTable() {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-}
 export default function Init() {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [products, setProducts] = useState([]);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [totalOrders, setTotalOrders] = useState(0);
 
-  const createCoffeeData = (
-    id,
-    nome,
-    categoria,
-    marca,
-    descricao,
-    quantidade,
-    valor
-  ) => {
-    return { id, nome, categoria, marca, descricao, quantidade, valor };
-  };
+  useEffect(() => {
+    const getProducts = async () => {
+      const productsFromApi = await fetchProducts();
+      setProducts(productsFromApi);
+    };
 
-  const rows = [
-    createCoffeeData(
-      1,
-      "Café 150g - Avelã",
-      "Café",
-      "Marca A",
-      "Descrição do café de Avelã",
-      150,
-      3.7
-    ),
-    createCoffeeData(
-      2,
-      "Café 150g - Baunilha",
-      "Café",
-      "Marca B",
-      "Descrição do café de Baunilha",
-      150,
-      25.0
-    ),
-    createCoffeeData(
-      3,
-      "Café 150g - Caramelo",
-      "Café",
-      "Marca C",
-      "Descrição do café de Caramelo",
-      150,
-      16.0
-    ),
-    createCoffeeData(
-      4,
-      "Café 150g - Tradicional",
-      "Café",
-      "Marca D",
-      "Descrição do café Tradicional",
-      150,
-      6.0
-    ),
-    createCoffeeData(
-      5,
-      "Capuccino - Caseiro",
-      "Capuccino",
-      "Marca E",
-      "Descrição do Capuccino Caseiro",
-      250,
-      16.0
-    ),
-    createCoffeeData(
-      6,
-      "Capuccino - Expresso",
-      "Capuccino",
-      "Marca F",
-      "Descrição do Capuccino Expresso",
-      250,
-      3.2
-    ),
-    createCoffeeData(
-      7,
-      "Café 200g - Tradicional",
-      "Café",
-      "Marca G",
-      "Descrição do café Tradicional",
-      200,
-      9.0
-    ),
-  ].sort((a, b) => (a.quantidade < b.quantidade ? -1 : 1));
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+    const getUsers = async () => {
+      const usersFromApi = await fetchUsers();
+      setTotalUsers(usersFromApi.length);
+    };
+
+    const getOrders = async () => {
+      const ordersFromApi = await fetchOrders();
+      setTotalOrders(ordersFromApi.length);
+    };
+
+    getProducts();
+    getUsers();
+    getOrders();
+  }, []);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -194,15 +122,43 @@ export default function Init() {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+  const emptyRows =
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - products.length) : 0;
 
   return (
     <Box className={styles.init}>
       <Box className={styles.init__top}>
-        <Box className={styles.init__top__brown_1}>
-          
+        <Box className={styles.init__top__brown_1} style={{display: 'flex', flexDirection: 'row', gap: '1rem', justifiContent: 'center', alignItems:' center', width: '100%'}}>
+          <Box>
+          <SiCoffeescript style={{width: '100px', height: '100px', marginLeft: '2rem'}}/>
+          </Box>
+          <Box>
+          <Typography variant="h6">Produtos Adicionados</Typography>
+          <Typography variant="h4">{products.length}</Typography>
+          </Box>
+         
         </Box>
-        <Box className={styles.init__top__brown_2}></Box>
-        <Box className={styles.init__top__brown_3}></Box>
+        <Box className={styles.init__top__brown_2} style={{display: 'flex', flexDirection: 'row', gap: '1rem', justifiContent: 'center', alignItems:' center', width: '100%'}}>
+          <Box>
+          <FaUsersLine style={{width: '100px', height: '100px', marginLeft: '2rem'}}/>
+          </Box>
+          <Box>
+          <Typography variant="h6">Novos Clientes</Typography>
+          <Typography variant="h4">{totalUsers}</Typography>
+          </Box>
+        
+        </Box>
+        <Box className={styles.init__top__brown_3} style={{display: 'flex', flexDirection: 'row', gap: '1rem', justifiContent: 'center', alignItems:' center', width: '100%'}}>
+        <Box>
+          <TfiWrite style={{width: '100px', height: '100px', marginLeft: '2rem'}}/>
+          </Box>
+          <Box>
+          <Typography variant="h6">Pedidos Realizados</Typography>
+          <Typography variant="h4">{totalOrders}</Typography>
+          </Box>
+         
+        </Box>
       </Box>
 
       <TableContainer component={Paper} className={styles.init__table}>
@@ -215,44 +171,41 @@ export default function Init() {
         <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
           <TableHead>
             <TableRow>
+              <TableCell style={{ fontWeight: "bold" }}>Imagem</TableCell>
               <TableCell style={{ fontWeight: "bold" }}>ID</TableCell>
               <TableCell style={{ fontWeight: "bold" }}>Nome</TableCell>
-              <TableCell style={{ fontWeight: "bold" }}>Categoria</TableCell>
-              <TableCell style={{ fontWeight: "bold" }}>Marca</TableCell>
               <TableCell style={{ fontWeight: "bold" }}>Descrição</TableCell>
+              <TableCell style={{ fontWeight: "bold" }}>Cód. Barras</TableCell>
               <TableCell style={{ fontWeight: "bold" }}>Quantidade</TableCell>
               <TableCell style={{ fontWeight: "bold" }}>Valor</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {(rowsPerPage > 0
-              ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              : rows
-            ).map((row) => (
-              <TableRow key={row.name}>
-                <TableCell component="th" scope="row">
-                  {row.id}
+              ? products.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              : products
+            ).map((product) => (
+              <TableRow key={product.id}>
+                <TableCell style={{ width: 60, height: 60 }}>
+                  <img src={product.image} alt={product.name} style={{ width: '50px', height: '50px' }} />
                 </TableCell>
                 <TableCell style={{ width: 160 }} align="left">
-                  {row.nome}
+                  {product.id}
                 </TableCell>
                 <TableCell style={{ width: 160 }} align="left">
-                  {row.categoria}
+                  {product.name}
                 </TableCell>
                 <TableCell style={{ width: 160 }} align="left">
-                  {row.marca}
+                  {product.description}
                 </TableCell>
                 <TableCell style={{ width: 160 }} align="left">
-                  {row.descricao}
+                  {product.bar_code}
                 </TableCell>
                 <TableCell style={{ width: 160 }} align="left">
-                  {row.quantidade}
+                  {product.quantity} Un.
                 </TableCell>
                 <TableCell style={{ width: 160 }} align="left">
-                  {row.valor.toLocaleString("pt-br", {
-                    style: "currency",
-                    currency: "BRL",
-                  })}
+                  {Number(product.price).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}
                 </TableCell>
               </TableRow>
             ))}
@@ -267,7 +220,7 @@ export default function Init() {
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25, { label: "Todos", value: -1 }]}
                 colSpan={7}
-                count={rows.length}
+                count={products.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 slotProps={{

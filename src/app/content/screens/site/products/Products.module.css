@@ -7,7 +7,7 @@
     padding: 1rem;
     margin-bottom: 2rem;
     border-radius: 8px;
-    height: 400px;
+    height: auto;
     display: flex;
     flex-direction: column;
   }
@@ -21,10 +21,13 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
+    gap: 1rem
   }
   
   .searchButton {
     margin-left: 1rem;
+    background-color: #4E392A;
+    color: #4E392A
   }
   
   .productsGrid {
@@ -50,12 +53,11 @@
   }
   
   .relatedProductsTitle {
-    margin-top: 2rem;
+    margin-top: 10rem;
     margin-bottom: 1rem;
   }
   
   .relatedProductsGrid {
-    margin-bottom: 2rem;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -67,5 +69,13 @@
     color: white;
     padding: 2rem 0;
     text-align: center;
+  }
+  
+
+  .addToCartButton {
+    position: absolute;
+    top: 8px;
+    right: -10px;
+    background-color: rgba(255, 255, 255, 0.7);
   }
   

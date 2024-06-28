@@ -1,9 +1,7 @@
-import React from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
-  List,
   Paper,
   Table,
   TableBody,
@@ -15,12 +13,10 @@ import {
   TableRow,
   TextField,
   Typography,
-  Tooltip
+  Tooltip,
+  IconButton
 } from "@mui/material";
-
-import styles from "./users.module.css";
 import { useTheme } from "@mui/material/styles";
-import IconButton from "@mui/material/IconButton";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
@@ -29,6 +25,10 @@ import ArticleIcon from '@mui/icons-material/Article';
 import AddIcon from '@mui/icons-material/Add';
 import CreateUserModal from "@/app/components/Modal/Admin/CreateUserModal";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import { fetchUsers, deleteUser } from './API';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import styles from "./users.module.css";
 
 function TablePaginationActions(props) {
   const theme = useTheme();
@@ -92,45 +92,30 @@ function TablePaginationActions(props) {
   );
 }
 
-export function CustomPaginationActionsTable() {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-}
 export default function Users() {
-  function createData(id, name, email, position) {
-    return { id, name, email, position };
-  }
-
-  const [isCreateUserModalOpen, setIsCreateUserModalOpen] = useState(false); 
+  const [users, setUsers] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const rows = [
-    createData(1,"João Silva", "joao.silva@example.com",  "Administrador"),
-    createData(2, "Maria Santos", "maria.santos@example.com", "Funcionário"),
-    createData(3, "Pedro Oliveira", "pedro.oliveira@example.com", "Funcionário"),
-    createData(4, "Ana Costa", "ana.costa@example.com", "Funcionário"),
-    createData(5, "Laura Ferreira", "laura.ferreira@example.com", "Funcionário"),
-    createData(6, "Carlos Martins", "carlos.martins@example.com", "Funcionário"),
-    createData(7, "Camila Almeida", "camila.almeida@example.com", "Funcionário"),
-    createData(8, "Rafael Sousa", "rafael.sousa@example.com", "Funcionário"),
-    createData(9, "Fernanda Lima", "fernanda.lima@example.com", "Funcionário")
+  const [isCreateUserModalOpen, setIsCreateUserModalOpen] = useState(false);
+  const [userToEdit, setUserToEdit] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
-  ].sort((a, b) => (a.id < b.id ? -1 : 1));
+  useEffect(() => {
+    const getUsers = async () => {
+      const usersFromApi = await fetchUsers();
+      setUsers(usersFromApi);
+    };
+
+    getUsers();
+  }, []);
+
+  const refreshUsers = async () => {
+    const usersFromApi = await fetchUsers();
+    setUsers(usersFromApi);
+  };
 
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - users.length) : 0;
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -142,44 +127,101 @@ export default function Users() {
   };
 
   const handleOpenCreateUserModal = () => {
+    setUserToEdit(null);
     setIsCreateUserModalOpen(true);
   };
 
-  const handleCloseCreateUserModal = () => {
-    setIsCreateUserModalOpen(false);
+  const handleOpenEditUserModal = (user) => {
+    setUserToEdit(user);
+    setIsCreateUserModalOpen(true);
   };
 
+  const handleDeleteUser = async (id) => {
+    try {
+      await deleteUser(id);
+      setUsers(users.filter(user => user.id !== id));
+    } catch (error) {
+      console.error('Erro ao deletar usuário:', error);
+    }
+  };
+
+  const handleGenerateReport = () => {
+    const doc = new jsPDF();
+
+    doc.text('Relatório de Usuários', 14, 20);
+    doc.autoTable({
+      head: [['ID', 'Nome', 'Email', 'Cargo']],
+      body: users.map(user => [
+        user.id,
+        user.name,
+        user.email,
+        user.roleId === 1 ? 'Administrador' : user.roleId === 2 ? 'Cliente' : 'Funcionário'
+      ]),
+      startY: 30,
+    });
+
+    doc.save('relatorio_usuarios.pdf');
+  };
+
+  const filteredUsers = users.filter(user =>
+    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <Box className={styles.users}>
-      <Typography typography="h4" style={{fontWeight: "bold", color: "#1E3932"}}>
+      <Typography typography="h4" style={{ fontWeight: "bold", color: "#1E3932" }}>
         Usuários
       </Typography>
-      <Typography typography="label" style={{padding: '0 0 1rem 0', color: "#1E3932", fontSize: '.875rem'}}>
+      <Typography typography="label" style={{ padding: '0 0 1rem 0', color: "#1E3932", fontSize: '.875rem' }}>
         Gerencie todos os usuários
       </Typography>
       <TableContainer component={Paper} className={styles.users__table}>
         <Box className={styles.users__table__top}>
-            <Box className={styles.users__table__search}>
-                <TextField maxRows="1" id="outlined-basic" label="Pesquise os planos" variant="outlined" className={styles.users__table__input} />
-                <Button style={{background: '#D9D9D9', color: '#000'}} variant="contained" className={styles.users__table__button}>Pesquisar</Button>
-            </Box>
-            <Box className={styles.users__table__actions}>
-                <Button variant="contained" style={{background: '#4E392A'}} className={styles.users__search__input} >
-                    <ArticleIcon/>
-                    Gerar Relatório
-                </Button>
-                <Button variant="contained" style={{background: '#1E3932'}} className={styles.users__search__input} onClick={handleOpenCreateUserModal}>
-                    <AddIcon/>
-                    Novo Usuário
-                </Button>
-            </Box>
+          <Box className={styles.users__table__search}>
+            <TextField
+              maxRows="1"
+              id="outlined-basic"
+              label="Pesquise os usuários"
+              variant="outlined"
+              className={styles.users__table__input}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <Button
+              style={{ background: '#D9D9D9', color: '#000' }}
+              variant="contained"
+              className={styles.users__table__button}
+            >
+              Pesquisar
+            </Button>
+          </Box>
+          <Box className={styles.users__table__actions}>
+            <Button
+              variant="contained"
+              style={{ background: '#4E392A' }}
+              className={styles.users__search__input}
+              onClick={handleGenerateReport}
+            >
+              <ArticleIcon />
+              Gerar Relatório
+            </Button>
+            <Button
+              variant="contained"
+              style={{ background: '#1E3932' }}
+              className={styles.users__search__input}
+              onClick={handleOpenCreateUserModal}
+            >
+              <AddIcon />
+              Novo Usuário
+            </Button>
+          </Box>
         </Box>
         <Table aria-label="custom pagination table">
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}  align="left">ID</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }} align="left" >Nome</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }} align="left">ID</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }} align="left">Nome</TableCell>
               <TableCell align="left" sx={{ fontWeight: "bold" }}>
                 E-mail
               </TableCell>
@@ -193,32 +235,31 @@ export default function Users() {
           </TableHead>
           <TableBody>
             {(rowsPerPage > 0
-              ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              : rows
-            ).map((row) => (
-              <TableRow key={row.name}>
+              ? filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              : filteredUsers
+            ).map((user) => (
+              <TableRow key={user.id}>
                 <TableCell component="th" scope="row" align="left">
-                  {row.id}
+                  {user.id}
                 </TableCell>
                 <TableCell component="th" scope="row" align="left">
-                  {row.name}
-                </TableCell>
-                <TableCell  align="left">
-                  {row.email}
+                  {user.name}
                 </TableCell>
                 <TableCell align="left">
-                  {row.position}
+                  {user.email}
                 </TableCell>
-                <TableCell>
-                <Tooltip title="Editar usuário">
+                <TableCell align="left">
+                  {user.roleName}
+                </TableCell>
+                <TableCell style={{display: 'flex', gap: '1rem'}}>
+                  <Tooltip title="Editar usuário">
                     <span>
-                    <FaEdit style={{ cursor: "pointer" }} />{" "}
+                      <FaEdit style={{ cursor: "pointer" }} onClick={() => handleOpenEditUserModal(user)} />
                     </span>
                   </Tooltip>
-                
                   <Tooltip title="Excluir usuário">
                     <span>
-                      <FaTrash style={{ cursor: "pointer" }} color="red" />
+                      <FaTrash style={{ cursor: "pointer" }} color="red" onClick={() => handleDeleteUser(user.id)}/>
                     </span>
                   </Tooltip>
                 </TableCell>
@@ -226,7 +267,7 @@ export default function Users() {
             ))}
             {emptyRows > 0 && (
               <TableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={4} />
+                <TableCell colSpan={5} />
               </TableRow>
             )}
           </TableBody>
@@ -234,8 +275,8 @@ export default function Users() {
             <TableRow>
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25, { label: "Todos", value: -1 }]}
-                colSpan={4}
-                count={rows.length}
+                colSpan={5}
+                count={filteredUsers.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 slotProps={{
@@ -254,8 +295,12 @@ export default function Users() {
           </TableFooter>
         </Table>
       </TableContainer>
-       {/* Modal para gerar relatório */}
-       <CreateUserModal open={isCreateUserModalOpen} onClose={handleCloseCreateUserModal} />
+      <CreateUserModal
+        open={isCreateUserModalOpen}
+        onClose={() => setIsCreateUserModalOpen(false)}
+        userToEdit={userToEdit}
+        refreshUsers={refreshUsers}
+      />
     </Box>
   );
 }

@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import styles from "./Profile.module.css";
-import { MdPerson } from "react-icons/md";
 import { FaCircleUser } from "react-icons/fa6";
+import AuthContext from '@/app/context/AuthContext';
+import { fetchUserDetails } from './API'; // Supondo que você tenha uma função para buscar detalhes do usuário
 
 export default function ProfileClient() {
+  const { user } = useContext(AuthContext);
   const [fullName, setFullName] = useState("");
   const [cpf, setCpf] = useState("");
   const [phone, setPhone] = useState("");
@@ -13,6 +15,22 @@ export default function ProfileClient() {
   const [address, setAddress] = useState("");
   const [profileImage, setProfileImage] = useState("");
   const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    if (user) {
+      setFullName(user.name);
+      setEmail(user.email);
+      // Fetch additional details using user ID if necessary
+      const fetchDetails = async () => {
+        const details = await fetchUserDetails(user.sub);
+        setCpf(details.cpf || '');
+        setPhone(details.phone || '');
+        setCep(details.cep || '');
+        setAddress(details.address || '');
+      };
+      fetchDetails();
+    }
+  }, [user]);
 
   const handleSearchCep = () => {};
 

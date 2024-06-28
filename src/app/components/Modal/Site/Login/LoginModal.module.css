@@ -1,6 +1,8 @@
 .dialogPaper {
-    width: 30%;
+    width: 400px;
     border-radius: 0px;
+    height: 430px;
+    overflow: hidden;
   }
   
   .dialogTitle {
@@ -10,18 +12,28 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    overflow: hidden;
   }
   
   .closeButton {
     color: white;
-    margin-right: auto;
+    float: left;
   }
   
   .dialogContent {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    margin-top: -2rem;
+    margin-top: 1rem;
+    overflow: hidden;
+  }
+
+  .dialogActions{
+    display: flex;
+    width: 90%;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
   }
 
   .links {
@@ -44,6 +56,13 @@
 
 .button{
     background-color:#1E3932;
+    width: 100%;
+    color: #1E3932;
+    margin: 0 auto;
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
 }
 
 .button:hover{
